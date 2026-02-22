@@ -172,5 +172,26 @@
             }
         }
     </script>
+<div class="glass-effect p-6 rounded-[2rem] mt-12 animate-fade">
+    <h3 class="text-2xl font-black mb-6 flex items-center">
+        <i class="fas fa-map-marked-alt text-blue-500 mr-3"></i> 
+        Türkiye Altyapı Isı Haritası
+    </h3>
+    
+    <div id="turkiye-haritasi" class="w-full h-[500px] bg-slate-800/50 rounded-2xl flex items-center justify-center border border-slate-700">
+        <p class="text-slate-500 italic">Harita Modülü Yükleniyor...</p>
+    </div>
+
+    <div id="harita-info" class="mt-4 grid grid-cols-2 gap-4">
+        <div class="p-4 bg-blue-500/10 rounded-xl border border-blue-500/20 text-center">
+            <span class="block text-xs text-slate-400 uppercase">Fiber Oranı</span>
+            <span id="fiber-oran" class="text-xl font-black text-blue-400">%--</span>
+        </div>
+        <div class="p-4 bg-orange-500/10 rounded-xl border border-orange-500/20 text-center">
+            <span class="block text-xs text-slate-400 uppercase">VDSL Oranı</span>
+            <span id="vdsl-oran" class="text-xl font-black text-orange-400">%--</span>
+        </div>
+    </div>
+</div>
 </body>
 </html>
