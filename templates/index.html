@@ -3,195 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetPusula | Altyapı Sorgu Merkezi</title>
+    <title>NetPusula | Altyapı Isı Haritası & Sorgu</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
-        .glass-effect { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
-        .select-style { @apply bg-slate-800 border border-slate-600 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm outline-none transition-all disabled:opacity-30; }
+        .glass-effect { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        #map { z-index: 10; border-radius: 1.5rem; }
+        .leaflet-container { background: #0f172a !important; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.5s ease-out forwards; }
     </style>
 </head>
-<body class="bg-[#0b0f1a] text-slate-200 font-sans min-h-screen">
+<body class="bg-[#0b0f1a] text-slate-200 font-sans min-h-screen pb-20">
 
-    <div class="max-w-5xl mx-auto pt-12 px-4 pb-20">
+    <div class="max-w-6xl mx-auto pt-10 px-4">
         <header class="text-center mb-10">
-            <div class="inline-block p-2 px-4 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-4 uppercase tracking-widest">
-                İnsanlığın Hayrına Ücretsiz Servis
-            </div>
-            <h1 class="text-6xl font-black text-white mb-3 tracking-tighter italic italic">NetPusula</h1>
-            <p class="text-slate-400 text-lg">Adresini seç, tüm operatörlerin altyapı hızını anında gör.</p>
+            <h1 class="text-6xl font-black text-white mb-2 tracking-tighter italic italic">NetPusula</h1>
+            <p class="text-blue-400 font-medium tracking-wide uppercase text-xs">Türkiye'nin Bağımsız Altyapı Pusulası</p>
         </header>
 
-        <div class="glass-effect p-6 md:p-10 rounded-[2rem] shadow-2xl mb-12">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-500 ml-1">ŞEHİR</label>
-                    <select id="il" onchange="ilceGetir()" class="bg-slate-800 border border-slate-600 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm outline-none">
-                        <option value="">İl Seçiniz</option>
-                        <option value="34">İstanbul</option>
-                        <option value="06">Ankara</option>
-                        <option value="35">İzmir</option>
-                    </select>
-                </div>
+        <div class="glass-effect p-8 rounded-[2.5rem] shadow-2xl mb-8 border-b-4 border-blue-600/50">
+            <h3 class="text-xl font-bold mb-6 flex items-center text-white italic">
+                <i class="fas fa-map-marker-alt mr-3 text-blue-500"></i> BÖLGENİ SEÇ
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <select id="il" onchange="ilceGetir()" class="bg-slate-800 border border-slate-700 p-3.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    <option value="">İl Seçiniz</option>
+                    <option value="34">İstanbul</option>
+                    <option value="06">Ankara</option>
+                    <option value="35">İzmir</option>
+                </select>
 
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-500 ml-1">İLÇE</label>
-                    <select id="ilce" onchange="mahalleGetir()" disabled class="bg-slate-800 border border-slate-600 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm outline-none disabled:opacity-30">
-                        <option value="">Önce İl Seçin</option>
-                    </select>
-                </div>
+                <select id="ilce" onchange="mahalleGetir()" disabled class="bg-slate-800 border border-slate-700 p-3.5 rounded-xl text-sm outline-none disabled:opacity-30">
+                    <option value="">İlçe Seçin</option>
+                </select>
 
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-500 ml-1">MAHALLE</label>
-                    <select id="mahalle" onchange="binaGetir()" disabled class="bg-slate-800 border border-slate-600 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm outline-none disabled:opacity-30">
-                        <option value="">Önce İlçe Seçin</option>
-                    </select>
-                </div>
+                <select id="mahalle" onchange="binaGetir()" disabled class="bg-slate-800 border border-slate-700 p-3.5 rounded-xl text-sm outline-none disabled:opacity-30">
+                    <option value="">Mahalle Seçin</option>
+                </select>
 
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-500 ml-1">BİNA NO</label>
-                    <select id="bina" onchange="daireGetir()" disabled class="bg-slate-800 border border-slate-600 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm outline-none disabled:opacity-30">
-                        <option value="">Önce Mahalle Seçin</option>
-                    </select>
-                </div>
+                <select id="bina" onchange="daireGetir()" disabled class="bg-slate-800 border border-slate-700 p-3.5 rounded-xl text-sm outline-none disabled:opacity-30">
+                    <option value="">Bina No</option>
+                </select>
 
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-500 ml-1">DAİRE NO</label>
-                    <select id="daire" disabled class="bg-slate-800 border border-slate-600 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm outline-none disabled:opacity-30">
-                        <option value="">Önce Bina Seçin</option>
-                    </select>
-                </div>
-
-                <div class="flex flex-col gap-2 justify-end">
-                    <button onclick="sorgula()" class="bg-blue-600 hover:bg-blue-500 text-white font-black py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/20 uppercase tracking-wider">
-                        Altyapı Sorgula
-                    </button>
-                </div>
+                <button onclick="sorgula()" class="bg-blue-600 hover:bg-blue-500 text-white font-black py-3.5 rounded-xl transition-all shadow-lg uppercase tracking-widest text-xs">
+                    SORGULA
+                </button>
             </div>
         </div>
 
-        <div id="loader" class="hidden text-center py-10 animate-pulse">
-            <div class="inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <p class="mt-4 text-blue-400 font-bold tracking-widest uppercase text-xs">Sinyal Gönderiliyor...</p>
+        <div class="glass-effect p-6 rounded-[2.5rem] mb-12 border-t border-slate-700">
+            <div class="flex justify-between items-center mb-6 px-2">
+                <h3 class="text-2xl font-black italic text-white flex items-center">
+                    <i class="fas fa-satellite-dish mr-3 text-blue-500"></i> İNTERNET ISI HARİTASI
+                </h3>
+                <div class="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] text-blue-400 font-bold">
+                    CANLI VERİ (BETA)
+                </div>
+            </div>
+
+            <div id="map" class="w-full h-[400px] shadow-inner mb-6"></div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">
+                    <span class="text-[10px] text-slate-500 uppercase font-black block mb-1">Ortalama Fiber</span>
+                    <span id="stat-fiber" class="text-xl font-black text-blue-400">%0</span>
+                </div>
+                <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">
+                    <span class="text-[10px] text-slate-500 uppercase font-black block mb-1">Ortalama VDSL</span>
+                    <span id="stat-vdsl" class="text-xl font-black text-orange-400">%0</span>
+                </div>
+                <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">
+                    <span class="text-[10px] text-slate-500 uppercase font-black block mb-1">Kullanıcı Yorumu</span>
+                    <span class="text-xl font-black text-white">0</span>
+                </div>
+                <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">
+                    <span class="text-[10px] text-slate-500 uppercase font-black block mb-1">Şehir Puanı</span>
+                    <span class="text-xl font-black text-yellow-400">0.0</span>
+                </div>
+            </div>
         </div>
 
         <div id="sonucAlani" class="hidden animate-fade">
-            <div class="overflow-x-auto rounded-3xl border border-slate-800 shadow-2xl">
-                <table class="w-full text-left bg-slate-900/50 backdrop-blur-md">
-                    <thead class="bg-slate-800/50 text-slate-400 text-[10px] uppercase font-black tracking-[0.2em]">
-                        <tr>
-                            <th class="p-6">İnternet Servis Sağlayıcı</th>
-                            <th class="p-6">Hız Kapasitesi</th>
-                            <th class="p-6">Altyapı Türü</th>
-                            <th class="p-6">Port</th>
-                            <th class="p-6">Aksiyon</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabloGövde" class="divide-y divide-slate-800">
-                        </tbody>
+             <div id="tabloKapsayici" class="overflow-hidden rounded-3xl border border-slate-800 shadow-2xl bg-slate-900/50">
+                <table class="w-full text-left">
+                    <tbody id="tabloGövde" class="divide-y divide-slate-800"></tbody>
                 </table>
-            </div>
+             </div>
         </div>
     </div>
 
     <script>
-        // Kanki, buradaki fonksiyonlar şimdilik bir sonraki kutuyu açıyor. 
-        // Python tarafında API'leri bağladığımızda buralar dolacak.
+        // --- HARİTA AYARLARI ---
+        var map = L.map('map').setView([39.0, 35.0], 6);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: 'NetPusula'
+        }).addTo(map);
+
+        // --- ADRES SEÇİCİ FONKSİYONLARI ---
         function ilceGetir() {
             const ilce = document.getElementById('ilce');
             ilce.disabled = false;
-            ilce.innerHTML = '<option value="1">Merkez</option><option value="2">Kadıköy</option><option value="3">Çankaya</option>';
+            ilce.innerHTML = '<option value="">İlçe Seçiniz</option><option value="kadikoy">Kadıköy</option><option value="cankaya">Çankaya</option>';
+            // Haritayı o ile odakla (Örnek İstanbul)
+            if(document.getElementById('il').value == "34") map.flyTo([41.0, 29.0], 10);
         }
 
         function mahalleGetir() {
-            const mahalle = document.getElementById('mahalle');
-            mahalle.disabled = false;
-            mahalle.innerHTML = '<option value="101">Atatürk Mah.</option><option value="102">Cumhuriyet Mah.</option>';
+            document.getElementById('mahalle').disabled = false;
+            document.getElementById('mahalle').innerHTML = '<option value="">Mahalle Seçiniz</option><option value="ataturk">Atatürk Mah.</option>';
         }
 
         function binaGetir() {
             document.getElementById('bina').disabled = false;
-            document.getElementById('bina').innerHTML = '<option value="5">No: 5</option><option value="12">No: 12</option>';
-        }
-
-        function daireGetir() {
-            document.getElementById('daire').disabled = false;
-            document.getElementById('daire').innerHTML = '<option value="1">Daire: 1</option><option value="2">Daire: 2</option>';
+            document.getElementById('bina').innerHTML = '<option value="">No Seçiniz</option><option value="1">No: 1</option>';
         }
 
         async function sorgula() {
-            const loader = document.getElementById('loader');
-            const sonucAlani = document.getElementById('sonucAlani');
             const tablo = document.getElementById('tabloGövde');
+            const sonucAlani = document.getElementById('sonucAlani');
+            
+            // Simüle veri çekme
+            const response = await fetch('/sorgula/123');
+            const data = await response.json();
 
-            loader.classList.remove('hidden');
-            sonucAlani.classList.add('hidden');
+            tablo.innerHTML = data.map(v => `
+                <tr class="hover:bg-blue-500/5 transition">
+                    <td class="p-6 font-black text-white">${v.iss}</td>
+                    <td class="p-6 text-blue-400 font-black text-xl">${v.hiz}</td>
+                    <td class="p-6 text-slate-400 text-xs">${v.tur}</td>
+                    <td class="p-6 text-right"><a href="${v.link}" class="bg-white text-black px-4 py-2 rounded-lg font-bold text-xs">BAŞVUR</a></td>
+                </tr>
+            `).join('');
 
-            try {
-                // Deneme amaçlı BBK 12345 gönderiyoruz
-                const response = await fetch('/sorgula/12345');
-                const veriler = await response.json();
-
-                tablo.innerHTML = veriler.map(v => `
-                    <tr class="hover:bg-blue-500/5 transition-colors border-l-4 border-transparent hover:border-blue-500">
-                        <td class="p-6">
-                            <div class="font-black text-white text-lg">${v.iss}</div>
-                            <div class="text-[10px] text-slate-500 uppercase tracking-tighter">Resmi Altyapı</div>
-                        </td>
-                        <td class="p-6">
-                            <span class="text-2xl font-black text-blue-400">${v.hiz}</span>
-                        </td>
-                        <td class="p-6">
-                            <span class="px-3 py-1 bg-slate-800 rounded-lg text-xs font-bold border border-slate-700">${v.tur}</span>
-                        </td>
-                        <td class="p-6">
-                            <div class="flex items-center text-green-400 text-xs font-bold">
-                                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
-                                AKTİF
-                            </div>
-                        </td>
-                        <td class="p-6 text-right">
-                            <a href="${v.link}" class="bg-white text-black text-xs font-black px-5 py-2.5 rounded-xl hover:bg-blue-500 hover:text-white transition-all">
-                                BAŞVUR
-                            </a>
-                        </td>
-                    </tr>
-                `).join('');
-
-                setTimeout(() => {
-                    loader.classList.add('hidden');
-                    sonucAlani.classList.remove('hidden');
-                }, 800);
-
-            } catch (error) {
-                alert("Hata oluştu kanki!");
-                loader.classList.add('hidden');
-            }
+            sonucAlani.classList.remove('hidden');
+            document.getElementById('stat-fiber').innerText = "%82";
+            document.getElementById('stat-vdsl').innerText = "%15";
         }
     </script>
-<div class="glass-effect p-6 rounded-[2rem] mt-12 animate-fade">
-    <h3 class="text-2xl font-black mb-6 flex items-center">
-        <i class="fas fa-map-marked-alt text-blue-500 mr-3"></i> 
-        Türkiye Altyapı Isı Haritası
-    </h3>
-    
-    <div id="turkiye-haritasi" class="w-full h-[500px] bg-slate-800/50 rounded-2xl flex items-center justify-center border border-slate-700">
-        <p class="text-slate-500 italic">Harita Modülü Yükleniyor...</p>
-    </div>
-
-    <div id="harita-info" class="mt-4 grid grid-cols-2 gap-4">
-        <div class="p-4 bg-blue-500/10 rounded-xl border border-blue-500/20 text-center">
-            <span class="block text-xs text-slate-400 uppercase">Fiber Oranı</span>
-            <span id="fiber-oran" class="text-xl font-black text-blue-400">%--</span>
-        </div>
-        <div class="p-4 bg-orange-500/10 rounded-xl border border-orange-500/20 text-center">
-            <span class="block text-xs text-slate-400 uppercase">VDSL Oranı</span>
-            <span id="vdsl-oran" class="text-xl font-black text-orange-400">%--</span>
-        </div>
-    </div>
-</div>
 </body>
 </html>
