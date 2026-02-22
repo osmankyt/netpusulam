@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetPusula | Altyapı - Hız Testi - Paketler</title>
+    <title>NetPusula | Akıllı Altyapı Haritası</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,137 +11,120 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        .glass-effect { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
-        .tab-active { @apply border-b-4 border-blue-500 text-blue-500 bg-blue-500/10; }
-        #map { border-radius: 1.5rem; background: #0b1120; min-height: 400px; width: 100%; z-index: 10; }
-        .speedtest-frame { width: 100%; height: 650px; border: none; border-radius: 2rem; }
-        .animate-pop { animation: pop 0.4s ease-out forwards; }
-        @keyframes pop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .glass-effect { background: rgba(15, 23, 42, 0.90); backdrop-filter: blur(15px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        #map { border-radius: 2rem; background: #0b1120; height: 500px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .info-box { background: rgba(15, 23, 42, 0.95); border: 1px solid #3b82f6; color: white; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+        .tab-active { border-bottom: 4px solid #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
     </style>
 </head>
-<body class="bg-[#0b0f1a] text-slate-200 font-sans min-h-screen pb-20">
+<body class="bg-[#0b0f1a] text-slate-200 font-sans min-h-screen">
 
-    <div class="max-w-6xl mx-auto pt-8 px-4">
-        <header class="text-center mb-8">
-            <h1 class="text-5xl font-black text-white italic tracking-tighter uppercase">NetPusula</h1>
-            <p class="text-blue-400 text-xs font-bold tracking-[0.3em] mt-2 text-center uppercase">Hız, Altyapı ve Bağımsız Rehber</p>
+    <div class="max-w-6xl mx-auto pt-6 px-4">
+        <header class="text-center mb-6">
+            <h1 class="text-4xl font-black text-white italic tracking-tighter uppercase">NetPusula</h1>
+            <div class="flex justify-center gap-4 mt-4">
+                <button onclick="tabAc('altyapi')" class="px-6 py-2 rounded-xl glass-effect text-sm font-bold tab-active" id="btn-altyapi">HARİTA & SORGU</button>
+                <button onclick="tabAc('hiztesti')" class="px-6 py-2 rounded-xl glass-effect text-sm font-bold" id="btn-hiztesti">HIZ TESTİ</button>
+            </div>
         </header>
 
-        <div class="flex justify-center mb-8">
-            <div class="glass-effect flex p-1 rounded-2xl w-full md:w-auto overflow-hidden">
-                <button onclick="tabAc('altyapi')" id="btn-altyapi" class="tab-btn flex-1 md:flex-none px-8 py-3 font-bold text-sm transition-all tab-active">
-                    <i class="fas fa-search-location mr-2"></i> ALTYAPI SORGU
-                </button>
-                <button onclick="tabAc('hiztesti')" id="btn-hiztesti" class="tab-btn flex-1 md:flex-none px-8 py-3 font-bold text-sm transition-all text-slate-400">
-                    <i class="fas fa-tachometer-alt mr-2"></i> HIZ TESTİ
-                </button>
-                <button onclick="tabAc('paketler')" id="btn-paketler" class="tab-btn flex-1 md:flex-none px-8 py-3 font-bold text-sm transition-all text-slate-400">
-                    <i class="fas fa-box-open mr-2"></i> PAKETLER
-                </button>
-            </div>
-        </div>
-
-        <div id="tab-altyapi" class="tab-content">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-1 glass-effect p-6 rounded-[2.5rem] border-l-4 border-blue-500 h-fit">
-                    <h3 class="text-white font-black mb-4">📍 NOKTA ATIŞI SORGU</h3>
-                    <div class="space-y-3">
-                        <select id="il" onchange="ilceGetir()" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none text-white">
-                            <option value="">İl Seçiniz</option>
-                            <option value="34">İstanbul</option>
-                            <option value="06">Ankara</option>
-                        </select>
-                        <select id="ilce" onchange="mahalleGetir()" disabled class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm disabled:opacity-30 text-white"><option value="">İlçe Seçin</option></select>
-                        <select id="mahalle" onchange="binaGetir()" disabled class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm disabled:opacity-30 text-white"><option value="">Mahalle Seçin</option></select>
-                        <select id="bina" onchange="daireGetir()" disabled class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm disabled:opacity-30 text-white"><option value="">Bina No</option></select>
-                        <select id="daire" disabled class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm disabled:opacity-30 text-white"><option value="">Daire No</option></select>
-                        <button onclick="sorgula()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-lg transition-all mt-2">ALTYAPIYI GÖR</button>
-                    </div>
+        <div id="tab-altyapi" class="space-y-6">
+            <div class="glass-effect p-4 rounded-[2.5rem] relative">
+                <div class="absolute top-8 left-8 z-[1000] glass-effect p-4 rounded-2xl hidden md:block border-blue-500/50">
+                    <h4 class="text-xs font-black text-blue-400 uppercase italic">Harita Rehberi</h4>
+                    <p class="text-[10px] text-slate-400">🔍 İle tıkla, ilçeleri gör.</p>
+                    <p class="text-[10px] text-slate-400">🖱️ Üzerinde gez, oranları gör.</p>
                 </div>
                 
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="glass-effect p-4 rounded-[2.5rem]">
-                        <div id="map"></div>
-                    </div>
+                <div id="map"></div>
+            </div>
 
-                    <div id="sonucAlani" class="hidden animate-pop space-y-4">
-                        <div class="glass-effect p-6 rounded-[2rem] border-t-4 border-green-500">
-                            <div class="flex justify-between items-center mb-4">
-                                <h4 class="text-xl font-black text-white italic">SORGU SONUCU</h4>
-                                <span class="bg-green-500/20 text-green-400 text-[10px] px-3 py-1 rounded-full font-bold">PORT AKTİF</span>
-                            </div>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
-                                <div class="p-3 bg-slate-800 rounded-2xl">
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Teknoloji</p>
-                                    <p class="text-lg font-black text-blue-400">Fiber (GPON)</p>
-                                </div>
-                                <div class="p-3 bg-slate-800 rounded-2xl">
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Maksimum Hız</p>
-                                    <p class="text-lg font-black text-white">1000 Mbps</p>
-                                </div>
-                                <div class="p-3 bg-slate-800 rounded-2xl col-span-2 md:col-span-1">
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Santral Mesafesi</p>
-                                    <p class="text-lg font-black text-slate-300">12 Metre</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 glass-effect p-6 rounded-[2rem]">
+                <select id="il" onchange="ilceGetir()" class="bg-slate-800 p-3 rounded-xl text-xs border border-slate-700 outline-none"><option value="">İl</option><option value="34">İstanbul</option></select>
+                <select id="ilce" onchange="mahalleGetir()" disabled class="bg-slate-800 p-3 rounded-xl text-xs border border-slate-700 opacity-50"><option value="">İlçe</option></select>
+                <select id="mahalle" disabled class="bg-slate-800 p-3 rounded-xl text-xs border border-slate-700 opacity-50"><option value="">Mahalle</option></select>
+                <button onclick="sorgula()" class="bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs py-3 uppercase">Sorgula</button>
             </div>
         </div>
 
-        <div id="tab-hiztesti" class="tab-content hidden animate-pop">
+        <div id="tab-hiztesti" class="hidden">
             <div class="glass-effect p-2 rounded-[2.5rem] overflow-hidden">
-                <iframe class="speedtest-frame" src="https://openspeedtest.com/speedtest" allow="geolocation"></iframe>
+                <iframe src="https://openspeedtest.com/speedtest" style="width:100%; height:600px; border:none; border-radius:2rem;"></iframe>
             </div>
-        </div>
-
-        <div id="tab-paketler" class="tab-content hidden animate-pop">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass-effect p-8 rounded-[2.5rem] border-t-4 border-blue-500 text-center relative">
-                    <div class="absolute top-4 right-4 bg-blue-500 text-[10px] font-black px-2 py-1 rounded text-white italic">HIZ KRALI</div>
-                    <h4 class="text-xl font-black mb-2 italic">TurkNet GigaFiber</h4>
-                    <div class="text-4xl font-black text-white mb-4">1000<span class="text-sm font-normal text-slate-400"> Mbps</span></div>
-                    <button class="w-full bg-white text-black font-black py-3 rounded-xl hover:bg-blue-500 hover:text-white transition-all">HEMEN BAŞVUR</button>
-                </div>
-                </div>
         </div>
     </div>
 
     <script>
-        // --- SEKMELER ---
-        function tabAc(tabIsmi) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active', 'text-blue-500'));
-            document.getElementById('tab-' + tabIsmi).classList.remove('hidden');
-            document.getElementById('btn-' + tabIsmi).classList.add('tab-active');
-            if(tabIsmi === 'altyapi') { setTimeout(() => { map.invalidateSize(); }, 200); }
-        }
+        // --- HARİTA AYARLARI ---
+        var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([39.0, 35.5], 6);
+        
+        // Koyu Tema Harita Katmanı
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png').addTo(map);
 
-        // --- HARİTA ---
-        var map = L.map('map', { zoomControl: false }).setView([39.0, 35.0], 5);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+        // ÖRNEK VERİLER (Kanki bunları sonra Python'dan (JSON) çekeceğiz)
+        const veriTabani = {
+            "İstanbul": { fiber: "%88", vdsl: "%94", renk: "#3b82f6" },
+            "Ankara": { fiber: "%72", vdsl: "%85", renk: "#10b981" },
+            "İzmir": { fiber: "%65", vdsl: "%80", renk: "#f59e0b" }
+        };
 
-        // --- ADRES ZİNCİRİ ---
-        function ilceGetir() { 
-            document.getElementById('ilce').disabled = false; 
-            document.getElementById('ilce').innerHTML = '<option value="">İlçe Seçin</option><option value="kadikoy">Kadıköy</option>';
-            if(document.getElementById('il').value == "34") map.flyTo([41.0, 29.0], 10);
-        }
-        function mahalleGetir() { document.getElementById('mahalle').disabled = false; document.getElementById('mahalle').innerHTML = '<option value="ataturk">Atatürk Mah.</option>'; }
-        function binaGetir() { document.getElementById('bina').disabled = false; document.getElementById('bina').innerHTML = '<option value="5">No: 5</option>'; }
-        function daireGetir() { document.getElementById('daire').disabled = false; document.getElementById('daire').innerHTML = '<option value="1">Daire: 1</option>'; }
+        // --- İLLERİ YÜKLE ---
+        fetch('https://raw.githubusercontent.com/cihad/tr-iller-geojson/master/tr-iller.json')
+        .then(res => res.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: function(feature) {
+                    return { color: "#1e293b", weight: 1.5, fillColor: "#1e293b", fillOpacity: 0.7 };
+                },
+                onEachFeature: function(feature, layer) {
+                    let ilAdi = feature.properties.name;
+                    let istatistik = veriTabani[ilAdi] || { fiber: "%--", vdsl: "%--" };
 
-        // --- SORGULAMA FONKSİYONU ---
-        function sorgula() {
-            const il = document.getElementById('il').value;
-            if(!il) { alert("Lütfen adres seç kanki!"); return; }
+                    // Fare Üzerine Gelince
+                    layer.on('mouseover', function(e) {
+                        this.setStyle({ fillColor: "#3b82f6", fillOpacity: 0.9, color: "#fff" });
+                        
+                        // TOOLTIP (Değerleri gösteren kutu)
+                        let popupHtml = `
+                            <div class="info-box">
+                                <p class="text-blue-400 mb-1">${ilAdi.toUpperCase()}</p>
+                                <p>📶 Fiber: <span class="text-white">${istatistik.fiber}</span></p>
+                                <p>⚡ VDSL: <span class="text-white">${istatistik.vdsl}</span></p>
+                            </div>
+                        `;
+                        layer.bindTooltip(popupHtml, { sticky: true, direction: 'top', className: 'custom-tooltip' }).openTooltip();
+                    });
+
+                    // Fare Çıkınca
+                    layer.on('mouseout', function() {
+                        this.setStyle({ fillColor: "#1e293b", fillOpacity: 0.7, color: "#1e293b" });
+                    });
+
+                    // Tıklayınca (Zoom ve İlçe Modu)
+                    layer.on('click', function() {
+                        map.fitBounds(layer.getBounds());
+                        // Buraya ileride ilçe GeoJSON dosyasını yükleme kodu gelecek
+                        console.log(ilAdi + " ilçeleri yükleniyor...");
+                    });
+                }
+            }).addTo(map);
+        });
+
+        // --- FONKSİYONLAR ---
+        function tabAc(id) {
+            document.getElementById('tab-altyapi').classList.add('hidden');
+            document.getElementById('tab-hiztesti').classList.add('hidden');
+            document.getElementById('btn-altyapi').classList.remove('tab-active');
+            document.getElementById('btn-hiztesti').classList.remove('tab-active');
             
-            // Sonuç alanını göster
-            const sonuc = document.getElementById('sonucAlani');
-            sonuc.classList.remove('hidden');
-            sonuc.scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            document.getElementById('btn-' + id).classList.add('tab-active');
+            if(id === 'altyapi') { setTimeout(() => { map.invalidateSize(); }, 200); }
         }
+
+        function ilceGetir() { document.getElementById('ilce').disabled = false; document.getElementById('ilce').classList.remove('opacity-50'); }
+        function mahalleGetir() { document.getElementById('mahalle').disabled = false; document.getElementById('mahalle').classList.remove('opacity-50'); }
+        function sorgula() { alert("Detaylı altyapı raporu hazırlanıyor..."); }
     </script>
 </body>
 </html>
