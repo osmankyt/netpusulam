@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetPusula | Altyapı & Hız Testi</title>
+    <title>NetPusula | Altyapı - Hız Testi - Paketler</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,80 +12,153 @@
 
     <style>
         .glass-effect { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
-        #map { border-radius: 1.5rem; background: #0b1120; }
-        .speedtest-frame { width: 100%; height: 600px; border: none; border-radius: 2rem; }
+        .tab-active { @apply border-b-4 border-blue-500 text-blue-500 bg-blue-500/10; }
+        .hidden { display: none; }
+        #map { border-radius: 1.5rem; background: #0b1120; min-height: 400px; width: 100%; }
+        iframe { width: 100%; height: 650px; border: none; border-radius: 2rem; }
     </style>
 </head>
 <body class="bg-[#0b0f1a] text-slate-200 font-sans min-h-screen pb-20">
 
-    <div class="max-w-6xl mx-auto pt-10 px-4">
-        <header class="text-center mb-10">
-            <h1 class="text-6xl font-black text-white italic tracking-tighter">NetPusula</h1>
-            <p class="text-blue-500 font-bold uppercase text-xs tracking-[0.3em]">Hızını Ölç, Geleceğini Gör</p>
+    <div class="max-w-6xl mx-auto pt-8 px-4">
+        <header class="text-center mb-8">
+            <h1 class="text-5xl font-black text-white italic tracking-tighter uppercase">NetPusula</h1>
+            <p class="text-blue-400 text-xs font-bold tracking-[0.3em] mt-2">Hız, Altyapı ve En İyi Teklifler</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-            <div class="lg:col-span-1 glass-effect p-6 rounded-[2.5rem]">
-                <h3 class="text-xl font-bold mb-4 italic text-white italic">📍 Adres Sorgu</h3>
-                <div class="space-y-3">
-                    <select id="il" onchange="ilceGetir()" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">İl Seçiniz</option>
-                        <option value="34">İstanbul</option>
-                        <option value="06">Ankara</option>
-                    </select>
-                    <select id="ilce" disabled class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm outline-none disabled:opacity-30">
-                        <option value="">İlçe Seçin</option>
-                    </select>
-                    <button onclick="sorgula()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl transition-all shadow-lg uppercase text-xs">Sorgula</button>
-                </div>
-            </div>
-
-            <div class="lg:col-span-2 glass-effect p-4 rounded-[2.5rem]">
-                <div id="map" class="w-full h-[350px]"></div>
+        <div class="flex justify-center mb-8">
+            <div class="glass-effect flex p-1 rounded-2xl w-full md:w-auto overflow-hidden">
+                <button onclick="tabAc('altyapi')" id="btn-altyapi" class="tab-btn flex-1 md:flex-none px-8 py-3 font-bold text-sm transition-all tab-active">
+                    <i class="fas fa-search-location mr-2"></i> ALTYAPI SORGU
+                </button>
+                <button onclick="tabAc('hiztesti')" id="btn-hiztesti" class="tab-btn flex-1 md:flex-none px-8 py-3 font-bold text-sm transition-all text-slate-400">
+                    <i class="fas fa-tachometer-alt mr-2"></i> HIZ TESTİ
+                </button>
+                <button onclick="tabAc('paketler')" id="btn-paketler" class="tab-btn flex-1 md:flex-none px-8 py-3 font-bold text-sm transition-all text-slate-400">
+                    <i class="fas fa-box-open mr-2"></i> PAKETLER
+                </button>
             </div>
         </div>
 
-        <div class="glass-effect p-2 rounded-[3rem] mb-12 border-t border-blue-500/20 overflow-hidden shadow-2xl">
-            <div class="text-center py-4">
-                <h3 class="text-2xl font-black italic text-white flex justify-center items-center">
-                    <i class="fas fa-tachometer-alt mr-3 text-blue-500"></i> CANLI HIZ TESTİ
-                </h3>
+        <div id="tab-altyapi" class="tab-content animate-fade">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-1 glass-effect p-6 rounded-[2.5rem] border-l-4 border-blue-500">
+                    <h3 class="text-white font-black mb-4">📍 ADRESİNİ BUL</h3>
+                    <div class="space-y-3">
+                        <select id="il" onchange="ilceGetir()" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="">İl Seçiniz</option>
+                            <option value="34">İstanbul</option>
+                            <option value="06">Ankara</option>
+                        </select>
+                        <select id="ilce" onchange="mahalleGetir()" disabled class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm disabled:opacity-30">
+                            <option value="">İlçe Seçiniz</option>
+                        </select>
+                        <select id="mahalle" onchange="binaGetir()" disabled class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm disabled:opacity-30">
+                            <option value="">Mahalle Seçiniz</option>
+                        </select>
+                        <select id="bina" onchange="daireGetir()" disabled class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm disabled:opacity-30">
+                            <option value="">Bina No</option>
+                        </select>
+                        <select id="daire" disabled class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm disabled:opacity-30">
+                            <option value="">Daire No</option>
+                        </select>
+                        <button onclick="sorgula()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-lg transition-all mt-2">SORGULA</button>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 glass-effect p-4 rounded-[2.5rem]">
+                    <div id="map"></div>
+                </div>
             </div>
-            <iframe class="speedtest-frame" src="https://openspeedtest.com/speedtest" allow="geolocation"></iframe>
+        </div>
+
+        <div id="tab-hiztesti" class="tab-content hidden animate-fade">
+            <div class="glass-effect p-2 rounded-[2.5rem] overflow-hidden">
+                <iframe src="https://openspeedtest.com/speedtest" allow="geolocation"></iframe>
+            </div>
+        </div>
+
+        <div id="tab-paketler" class="tab-content hidden animate-fade">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-effect p-8 rounded-[2.5rem] border-t-4 border-blue-500 text-center relative overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-blue-500 text-[10px] font-black px-2 py-1 rounded text-white">POPÜLER</div>
+                    <h4 class="text-xl font-black mb-2 italic">TurkNet GigaFiber</h4>
+                    <div class="text-4xl font-black text-white mb-4">1000<span class="text-sm font-normal text-slate-400"> Mbps</span></div>
+                    <ul class="text-sm text-slate-400 space-y-2 mb-8 text-left italic">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Taahhüt Yok</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Kotasız İnternet</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Düşük Ping (Gamer)</li>
+                    </ul>
+                    <a href="#" class="block w-full bg-white text-black font-black py-3 rounded-xl hover:bg-blue-500 hover:text-white transition-all">HEMEN BAŞVUR</a>
+                </div>
+
+                <div class="glass-effect p-8 rounded-[2.5rem] border-t-4 border-slate-600 text-center">
+                    <h4 class="text-xl font-black mb-2 italic text-slate-400">Millenicom Fiber</h4>
+                    <div class="text-4xl font-black text-white mb-4">100<span class="text-sm font-normal text-slate-400"> Mbps</span></div>
+                    <ul class="text-sm text-slate-400 space-y-2 mb-8 text-left italic">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Ekonomik Fiyat</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> TT Altyapısı</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Hızlı Kurulum</li>
+                    </ul>
+                    <a href="#" class="block w-full bg-slate-700 text-white font-black py-3 rounded-xl hover:bg-blue-500 transition-all">DETAYLARI GÖR</a>
+                </div>
+
+                <div class="glass-effect p-8 rounded-[2.5rem] border-t-4 border-orange-500 text-center">
+                    <h4 class="text-xl font-black mb-2 italic text-orange-400">GIBIRNet</h4>
+                    <div class="text-4xl font-black text-white mb-4">200<span class="text-sm font-normal text-slate-400"> Mbps</span></div>
+                    <ul class="text-sm text-slate-400 space-y-2 mb-8 text-left italic">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Oyuncu Odaklı</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Uygun Fiyat</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> 7/24 Destek</li>
+                    </ul>
+                    <a href="#" class="block w-full bg-orange-600 text-white font-black py-3 rounded-xl hover:bg-orange-500 transition-all text-xs">PAKETİ İNCELE</a>
+                </div>
+            </div>
         </div>
 
     </div>
 
     <script>
-        // --- Harita Başlatma ---
+        // --- SEKME YÖNETİMİ ---
+        function tabAc(tabIsmi) {
+            // Tüm içerikleri gizle
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            // Tüm butonları pasif yap
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active', 'text-blue-500'));
+            
+            // Seçileni göster
+            document.getElementById('tab-' + tabIsmi).classList.remove('hidden');
+            document.getElementById('btn-' + tabIsmi).classList.add('tab-active');
+            
+            // Harita sekmesine geçilince haritayı yenile (leaflet hatası vermesin)
+            if(tabIsmi === 'altyapi') { setTimeout(() => { map.invalidateSize(); }, 200); }
+        }
+
+        // --- HARİTA ---
         var map = L.map('map', { zoomControl: false }).setView([39.0, 35.0], 5);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-        // --- Türkiye İllerini Çizme (GeoJSON) ---
         fetch('https://raw.githubusercontent.com/cihad/tr-iller-geojson/master/tr-iller.json')
-            .then(res => res.json())
-            .then(data => {
+            .then(res => res.json()).then(data => {
                 L.geoJSON(data, {
                     style: { color: "#334155", weight: 1, fillColor: "#1e293b", fillOpacity: 0.6 },
-                    onEachFeature: function(feature, layer) {
-                        layer.on('mouseover', function() { this.setStyle({ fillColor: "#3b82f6", fillOpacity: 0.8 }); });
-                        layer.on('mouseout', function() { this.setStyle({ fillColor: "#1e293b", fillOpacity: 0.6 }); });
-                        layer.on('click', function() { 
-                            map.fitBounds(layer.getBounds());
-                            alert(feature.properties.name + " altyapı verileri yükleniyor...");
-                        });
+                    onEachFeature: function(f, l) {
+                        l.on('mouseover', function() { this.setStyle({ fillColor: "#3b82f6", fillOpacity: 0.8 }); });
+                        l.on('mouseout', function() { this.setStyle({ fillColor: "#1e293b", fillOpacity: 0.6 }); });
+                        l.on('click', function() { map.fitBounds(l.getBounds()); });
                     }
                 }).addTo(map);
             });
 
-        function ilceGetir() {
-            document.getElementById('ilce').disabled = false;
-            document.getElementById('ilce').innerHTML = '<option value="1">Kadıköy</option><option value="2">Çankaya</option>';
+        // --- ADRES ZİNCİRİ ---
+        function ilceGetir() { 
+            const ilce = document.getElementById('ilce'); ilce.disabled = false;
+            ilce.innerHTML = '<option value="">İlçe Seçin</option><option value="1">Kadıköy</option>';
+            if(document.getElementById('il').value == "34") map.flyTo([41.0, 29.0], 10);
         }
-
-        function sorgula() {
-            alert("Sorgu sonucu aşağıya eklendi kanki!");
-        }
+        function mahalleGetir() { document.getElementById('mahalle').disabled = false; document.getElementById('mahalle').innerHTML = '<option value="1">Atatürk Mah.</option>'; }
+        function binaGetir() { document.getElementById('bina').disabled = false; document.getElementById('bina').innerHTML = '<option value="1">No: 5</option>'; }
+        function daireGetir() { document.getElementById('daire').disabled = false; document.getElementById('daire').innerHTML = '<option value="1">Daire: 1</option>'; }
+        function sorgula() { alert("Sorgu sonucu paketler sekmesinde veya altta listelenebilir kanki!"); }
     </script>
 </body>
 </html>
