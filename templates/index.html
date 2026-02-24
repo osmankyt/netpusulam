@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetPusula | Altyapı Pusulası</title>
+    <title>NetPusula | Altyapı Atlası</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,172 +11,154 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        body { background-color: #0b0f1a; color: #cbd5e1; }
-        .glass-effect { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { background-color: #0b0f1a; color: #cbd5e1; font-family: 'Inter', sans-serif; }
+        .glass-effect { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
         
-        /* Kabartma Harita Konteynırı */
-        #map-container {
+        /* Harita Kabartma ve Gölge Efekti */
+        #map-wrapper {
             position: relative;
-            height: 450px;
+            height: 500px;
             width: 100%;
+            background: radial-gradient(circle, #1e293b 0%, #0b0f1a 100%);
             border-radius: 3rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(59, 130, 246, 0.2);
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(59, 130, 246, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            background: #0f172a;
         }
         
         #map { height: 100%; width: 100%; background: transparent !important; }
-        
+
+        /* Tooltip Tasarımı */
         .custom-tooltip {
-            background: rgba(15, 23, 42, 0.9) !important;
+            background: #1e293b !important;
             border: 1px solid #3b82f6 !important;
             color: white !important;
             border-radius: 12px;
-            padding: 8px;
-            font-size: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            padding: 10px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.3);
         }
 
-        /* Seçim kutuları tasarımı */
+        /* Input & Select Stil */
         select {
-            @apply bg-slate-800 border-none p-3 rounded-2xl text-xs text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all;
+            @apply bg-slate-800 border-none p-4 rounded-2xl text-xs text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
+            background-position: right 1rem center;
+            background-size: 1em;
         }
-        select:disabled { opacity: 0.2; cursor: not-allowed; }
+        select:disabled { opacity: 0.2; }
     </style>
 </head>
 <body class="pb-20">
 
-    <div class="max-w-6xl mx-auto pt-6 px-4">
-        <header class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-4xl font-black text-white italic tracking-tighter">NETPUSULA</h1>
-                <p class="text-[10px] text-blue-500 font-bold tracking-[0.4em] uppercase">Altyapı Atlası</p>
-            </div>
-            <div class="text-right">
-                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full font-bold border border-blue-500/30">CANLI VERİ</span>
-            </div>
+    <div class="max-w-6xl mx-auto pt-10 px-4">
+        <header class="text-center mb-12">
+            <h1 class="text-6xl font-black text-white italic tracking-tighter">NetPusula</h1>
+            <p class="text-blue-500 text-xs font-bold tracking-[0.5em] uppercase mt-2">Altyapı Isı Haritası</p>
         </header>
 
-        <div id="map-container" class="mb-10">
+        <div id="map-wrapper" class="mb-10">
             <div id="map"></div>
         </div>
 
-        <div class="glass-effect p-8 rounded-[3rem] shadow-2xl">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/30">
-                    <i class="fas fa-search-location text-white"></i>
+        <div class="glass-effect p-8 rounded-[3rem]">
+            <h3 class="text-xl font-black text-white mb-8 italic uppercase flex items-center">
+                <i class="fas fa-map-marked-alt mr-3 text-blue-500"></i> Detaylı Adres Sorgu
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">İl</label>
+                    <select id="il" onchange="ilceGetir()">
+                        <option value="">Seçiniz</option>
+                        <option value="34">İstanbul</option>
+                        <option value="06">Ankara</option>
+                        <option value="35">İzmir</option>
+                    </select>
                 </div>
-                <h3 class="text-2xl font-black text-white italic uppercase tracking-tight">Hızlı Altyapı Sorgu</h3>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2 uppercase">Şehir</label>
-                    <select id="il" onchange="ilceGetir()"><option value="">Seçiniz</option><option value="34">İstanbul</option><option value="06">Ankara</option></select>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2 uppercase">İlçe</label>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">İlçe</label>
                     <select id="ilce" onchange="mahalleGetir()" disabled><option value="">Önce İl Seçin</option></select>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2 uppercase">Mahalle</label>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">Mahalle</label>
                     <select id="mahalle" onchange="caddeGetir()" disabled><option value="">Önce İlçe Seçin</option></select>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2 uppercase">Cadde / Sokak</label>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">Cadde / Sokak</label>
                     <select id="cadde" onchange="binaGetir()" disabled><option value="">Önce Mahalle Seçin</option></select>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2 uppercase">Bina No</label>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">Bina No</label>
                     <select id="bina" onchange="daireGetir()" disabled><option value="">Bina No</option></select>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2 uppercase">Daire No</label>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">Daire No</label>
                     <select id="daire" disabled><option value="">Daire No</option></select>
                 </div>
             </div>
 
-            <button onclick="sorgula()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-blue-900/40 transition-all mt-8 uppercase tracking-[0.2em] text-sm">
-                Altyapı Detaylarını Getir
+            <button onclick="sorgula()" class="w-full bg-blue-600 hover:bg-blue-400 text-white font-black py-5 rounded-2xl mt-10 transition-all uppercase tracking-widest shadow-xl shadow-blue-900/20">
+                Sorgulamayı Başlat
             </button>
         </div>
     </div>
 
     <script>
-        // Harita Başlatma (Dış dünya yok, sadece TR odağı)
+        // Harita Başlatma (Dış dünya katmanı yok)
         var map = L.map('map', { 
             zoomControl: false, 
             attributionControl: false,
-            scrollWheelZoom: false,
-            dragging: true 
+            dragging: true,
+            scrollWheelZoom: false
         }).setView([39.1, 35.3], 6);
 
-        // Türkiye GeoJSON (Kabartma etkisi için stil)
+        // Renk Paleti (Görseldeki gibi bölgelere göre atanabilir)
+        const renkler = ["#ec4899", "#8b5cf6", "#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#6366f1"];
+
         fetch('https://raw.githubusercontent.com/cihad/tr-iller-geojson/master/tr-iller.json')
         .then(res => res.json())
         .then(data => {
             L.geoJSON(data, {
-                style: function() {
+                style: function(feature) {
+                    // Rastgele renk atayarak görseldeki havayı veriyoruz
+                    let renk = renkler[Math.floor(Math.random() * renkler.length)];
                     return { 
-                        color: "#3b82f6", 
-                        weight: 2, 
-                        fillColor: "#1e293b", 
-                        fillOpacity: 0.8,
-                        className: 'relief-effect'
+                        color: "#fff", 
+                        weight: 1, 
+                        fillColor: renk, 
+                        fillOpacity: 0.6 
                     };
                 },
                 onEachFeature: function(feature, layer) {
-                    let il = feature.properties.name;
-                    
                     layer.on('mouseover', function() {
-                        this.setStyle({ fillColor: "#3b82f6", fillOpacity: 1, weight: 3 });
+                        this.setStyle({ fillOpacity: 0.9, weight: 3 });
                         layer.bindTooltip(`
-                            <div class="text-center">
-                                <p class="font-black text-blue-400 border-b border-slate-600 mb-1">${il}</p>
-                                <p class="text-[10px]">Fiber: %85 | VDSL: %90</p>
+                            <div class="text-center font-bold">
+                                <p class="text-blue-400 uppercase">${feature.properties.name}</p>
+                                <p class="text-[10px] text-white">Fiber: %85 | VDSL: %92</p>
                             </div>
                         `, { sticky: true, className: 'custom-tooltip' }).openTooltip();
                     });
-
                     layer.on('mouseout', function() {
-                        this.setStyle({ fillColor: "#1e293b", fillOpacity: 0.8, weight: 2 });
+                        this.setStyle({ fillOpacity: 0.6, weight: 1 });
                     });
-
                     layer.on('click', function() {
-                        map.fitBounds(layer.getBounds(), { padding: [20, 20] });
+                        map.fitBounds(layer.getBounds());
                     });
                 }
             }).addTo(map);
         });
 
-        // Adres Fonksiyonları
-        function ilceGetir() { 
-            document.getElementById('ilce').disabled = false;
-            document.getElementById('ilce').innerHTML = '<option value="1">Kadıköy</option>';
-        }
-        function mahalleGetir() { 
-            document.getElementById('mahalle').disabled = false;
-            document.getElementById('mahalle').innerHTML = '<option value="1">Moda Mah.</option>';
-        }
-        function caddeGetir() { 
-            document.getElementById('cadde').disabled = false;
-            document.getElementById('cadde').innerHTML = '<option value="1">Lale Sokak</option>';
-        }
-        function binaGetir() { 
-            document.getElementById('bina').disabled = false;
-            document.getElementById('bina').innerHTML = '<option value="1">No: 12</option>';
-        }
-        function daireGetir() { 
-            document.getElementById('daire').disabled = false;
-            document.getElementById('daire').innerHTML = '<option value="1">Daire: 3</option>';
-        }
-        function sorgula() { alert("Sorgulama yapılıyor kanki..."); }
+        // Adres Zinciri (Kanki buralar senin main.py verilerine bağlanacak)
+        function ilceGetir() { document.getElementById('ilce').disabled = false; document.getElementById('ilce').innerHTML = '<option value="1">Kadıköy</option>'; }
+        function mahalleGetir() { document.getElementById('mahalle').disabled = false; document.getElementById('mahalle').innerHTML = '<option value="1">Moda Mah.</option>'; }
+        function caddeGetir() { document.getElementById('cadde').disabled = false; document.getElementById('cadde').innerHTML = '<option value="1">Lale Sokak</option>'; }
+        function binaGetir() { document.getElementById('bina').disabled = false; document.getElementById('bina').innerHTML = '<option value="1">No: 42</option>'; }
+        function daireGetir() { document.getElementById('daire').disabled = false; document.getElementById('daire').innerHTML = '<option value="1">Daire: 5</option>'; }
+        
+        function sorgula() { alert("Sorgu sonucu yükleniyor kanki!"); }
     </script>
 </body>
 </html>
