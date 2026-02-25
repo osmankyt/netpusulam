@@ -3,272 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetPusula | Profesyonel Altyapı Sorgu</title>
+    <title>NetPusula | Fiber Hızında Sorgulama</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        :root { --fiber-blue: #3b82f6; --fiber-glow: rgba(59, 130, 246, 0.5); }
         body { 
-            background-color: #060910; 
-            color: #cbd5e1; 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-image: radial-gradient(#1e293b 0.5px, transparent 0.5px);
-            background-size: 30px 30px;
-        }
-        
-        .glass-card { 
-            background: rgba(15, 23, 42, 0.6); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background-color: #060910; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: radial-gradient(#1e293b 0.5px, transparent 0.5px); background-size: 30px 30px;
+            overflow-x: hidden;
         }
 
-        /* Gelişmiş Seçim Kutuları */
+        /* Düzenli Seçim Alanları (Ports) */
+        .select-port {
+            @apply relative flex flex-col gap-2 transition-all duration-500;
+            min-height: 85px; /* Yer değiştirmeyi engellemek için sabit yükseklik */
+        }
+
         .custom-select {
-            @apply w-full bg-slate-900/80 border border-slate-700/50 text-white text-sm rounded-2xl p-4 outline-none transition-all cursor-pointer appearance-none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1.25rem center;
-            background-size: 1.2rem;
+            @apply w-full bg-slate-900 border border-slate-800 text-white text-sm rounded-xl p-4 outline-none transition-all appearance-none cursor-pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem;
         }
 
-        .custom-select:hover:not(:disabled) {
-            @apply border-blue-500/50 bg-slate-800;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+        .custom-select:focus:not(:disabled) {
+            @apply border-blue-500 bg-slate-800;
+            box-shadow: 0 0 20px var(--fiber-glow);
         }
 
-        .custom-select:focus {
-            @apply border-blue-500 ring-4 ring-blue-500/10;
+        .custom-select:disabled { @apply opacity-20 grayscale border-slate-900; cursor: not-allowed; }
+
+        /* Fiber Akış Animasyonu */
+        .fiber-line {
+            height: 2px; width: 0; background: linear-gradient(90deg, transparent, var(--fiber-blue), transparent);
+            position: absolute; bottom: -10px; left: 0; transition: width 1s ease-in-out;
         }
 
-        .custom-select:disabled {
-            @apply opacity-30 cursor-not-allowed border-slate-800;
+        .analyzing .fiber-line { width: 100%; animation: pulse-line 1.5s infinite; }
+
+        @keyframes pulse-line {
+            0% { opacity: 0.3; transform: translateX(-100%); }
+            100% { opacity: 1; transform: translateX(100%); }
         }
 
-        .nav-link { @apply text-slate-400 hover:text-white text-sm font-semibold transition-all; }
-        
-        .btn-glow {
-            @apply bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-5 px-8 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-900/20 active:scale-[0.98];
+        /* Kart Geçişleri */
+        .fade-slide-up { animation: fadeSlideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
+        .btn-fiber {
+            @apply bg-blue-600 hover:bg-blue-500 text-white font-black py-5 px-8 rounded-2xl transition-all relative overflow-hidden;
+            box-shadow: 0 0 0 0 var(--fiber-glow);
+        }
+        .btn-fiber:hover { box-shadow: 0 0 30px var(--fiber-glow); transform: translateY(-2px); }
     </style>
 </head>
 <body class="min-h-screen">
 
     <nav class="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <i class="fas fa-satellite-dish text-white text-lg"></i>
+        <div class="flex items-center gap-3 group cursor-pointer">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-blue-500/30">
+                <i class="fas fa-satellite-dish text-white"></i>
             </div>
-            <span class="text-2xl font-extrabold tracking-tighter text-white">NetPusula</span>
+            <span class="text-2xl font-black tracking-tighter text-white uppercase italic">NetPusula</span>
         </div>
-        <div class="hidden md:flex gap-10">
-            <a href="#" class="nav-link text-blue-500">Sorgula</a>
-            <a href="#" class="nav-link">Sağlayıcılar</a>
-            <a href="#" class="nav-link">SSS</a>
+        <div class="flex gap-8">
+            <a href="#" class="text-blue-500 text-xs font-bold uppercase tracking-widest">Sorgula</a>
+            <a href="#" class="text-slate-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-all">Sağlayıcılar</a>
+            <a href="#" class="text-slate-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-all">SSS</a>
         </div>
     </nav>
 
-    <main class="max-w-5xl mx-auto text-center mt-10 px-4">
-        <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-5 py-2 rounded-full mb-8">
-            <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-            </span>
-            <span class="text-blue-500 text-[11px] font-bold uppercase tracking-[0.2em]">Türkiye Geneli Altyapı Analizi</span>
+    <main class="max-w-5xl mx-auto mt-16 px-6">
+        <div class="text-center mb-16">
+            <div class="inline-block px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4">
+                Yeni Nesil Giga-Sorgu Aktif
+            </div>
+            <h1 class="text-6xl font-extrabold text-white tracking-tighter">Işık Hızında <span class="text-blue-500">Altyapı Analizi</span></h1>
         </div>
 
-        <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight tracking-tight">
-            İnternet Altyapını <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 italic">Nokta Atışı</span> Sorgula
-        </h1>
-
-        <div class="glass-card mt-16 p-10 rounded-[2.5rem] text-left relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50"></div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="space-y-3">
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                        <i class="fas fa-city text-blue-500"></i> Şehir Seçimi
-                    </label>
-                    <select id="il" class="custom-select" onchange="nextStep('ilce')">
-                        <option value="">Bir Şehir Seçiniz</option>
+        <div class="bg-slate-900/40 backdrop-blur-3xl p-10 rounded-[3rem] border border-white/5 shadow-2xl relative">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2">
+                
+                <div class="select-port">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1"><i class="fas fa-city mr-2 text-blue-500"></i> Şehir</label>
+                    <select id="il" class="custom-select" onchange="loadStep('ilce')">
+                        <option value="">Seçiniz</option>
                         <option value="34">İstanbul</option>
                         <option value="06">Ankara</option>
-                        <option value="35">İzmir</option>
                     </select>
                 </div>
 
-                <div class="space-y-3">
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                        <i class="fas fa-map-marked-alt text-blue-500"></i> İlçe
-                    </label>
-                    <select id="ilce" class="custom-select" onchange="nextStep('mahalle')" disabled>
-                        <option value="">Önce Şehir Seçin</option>
-                    </select>
+                <div class="select-port">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1"><i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> İlçe</label>
+                    <select id="ilce" class="custom-select" onchange="loadStep('mahalle')" disabled><option value="">Önce Şehir</option></select>
                 </div>
 
-                <div class="space-y-3">
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                        <i class="fas fa-layer-group text-blue-500"></i> Mahalle
-                    </label>
-                    <select id="mahalle" class="custom-select" onchange="nextStep('cadde')" disabled>
-                        <option value="">Önce İlçe Seçin</option>
-                    </select>
+                <div class="select-port">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1"><i class="fas fa-draw-polygon mr-2 text-blue-500"></i> Mahalle</label>
+                    <select id="mahalle" class="custom-select" onchange="loadStep('cadde')" disabled><option value="">Önce İlçe</option></select>
                 </div>
 
-                <div class="space-y-3">
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                        <i class="fas fa-road text-blue-500"></i> Sokak / Cadde
-                    </label>
-                    <select id="cadde" class="custom-select" onchange="nextStep('bina')" disabled>
-                        <option value="">Sokak Seçin</option>
-                    </select>
+                <div class="select-port">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1"><i class="fas fa-road mr-2 text-blue-500"></i> Cadde / Sokak</label>
+                    <select id="cadde" class="custom-select" onchange="loadStep('bina')" disabled><option value="">Önce Mahalle</option></select>
                 </div>
 
-                <div class="space-y-3">
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                        <i class="fas fa-hashtag text-blue-500"></i> Bina Kapı No
-                    </label>
-                    <select id="bina" class="custom-select" onchange="nextStep('daire')" disabled>
-                        <option value="">No Seçin</option>
-                    </select>
+                <div class="select-port">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1"><i class="fas fa-building mr-2 text-blue-500"></i> Bina No</label>
+                    <select id="bina" class="custom-select" onchange="loadStep('daire')" disabled><option value="">Bina No</option></select>
                 </div>
 
-                <div class="space-y-3">
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                        <i class="fas fa-door-open text-blue-500"></i> Daire No
-                    </label>
-                    <select id="daire" class="custom-select" disabled>
-                        <option value="">Daire Seçin</option>
-                    </select>
+                <div class="select-port">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1"><i class="fas fa-door-open mr-2 text-blue-500"></i> Daire No</label>
+                    <select id="daire" class="custom-select" disabled><option value="">Daire No</option></select>
                 </div>
+
             </div>
 
-            <button onclick="sorgula()" class="btn-glow w-full mt-10 uppercase tracking-[0.2em] text-sm">
-                <i class="fas fa-search-location"></i> Altyapıyı Analiz Et
-            </button>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 mb-20 border-y border-slate-800/50 py-12">
-            <div class="group cursor-default">
-                <p class="text-4xl font-black text-white group-hover:text-blue-500 transition-colors">81</p>
-                <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-2">Hizmet Verilen İl</p>
-            </div>
-            <div class="group cursor-default">
-                <p class="text-4xl font-black text-white group-hover:text-blue-500 transition-colors">973</p>
-                <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-2">Aktif İlçe</p>
-            </div>
-            <div class="group cursor-default">
-                <p class="text-4xl font-black text-white group-hover:text-blue-500 transition-colors">10M+</p>
-                <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-2">Tanımlı Adres</p>
-            </div>
-            <div class="group cursor-default">
-                <p class="text-4xl font-black text-white group-hover:text-blue-500 transition-colors">6+</p>
-                <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-2">Altyapı Sağlayıcı</p>
+            <div id="action-zone" class="mt-8 relative pt-4">
+                <div class="fiber-line"></div>
+                <button onclick="startAnalysis()" class="btn-fiber w-full uppercase tracking-[0.4em] text-xs">
+                    <i class="fas fa-bolt mr-2"></i> Analizi Başlat
+                </button>
             </div>
         </div>
 
-        <div id="sonucPaneli" class="hidden text-left space-y-6 pb-20 animate-fade">
-            <div class="flex items-center justify-between">
-                <h3 class="text-2xl font-black text-white">Altyapı Sağlayıcı Detayları</h3>
-                <span class="text-xs font-bold text-slate-500 uppercase bg-slate-800 px-4 py-1.5 rounded-full">Anlık Veri</span>
-            </div>
-            
-            <div class="grid gap-5">
-                <div class="glass-card p-8 rounded-3xl flex justify-between items-center border-l-4 border-orange-500 hover:bg-slate-800/40 transition-all">
-                    <div class="flex items-center gap-5">
-                        <div class="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center font-black text-orange-500 text-xl shadow-inner">TT</div>
-                        <div>
-                            <p class="text-lg font-bold text-white leading-none">Türk Telekom</p>
-                            <p class="text-sm text-slate-400 mt-1">Fiber Altyapı (GPON)</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-3xl font-black text-white italic">1000 <span class="text-sm not-italic text-slate-500 uppercase">Mbps</span></p>
-                        <p class="text-[10px] text-green-500 font-black uppercase tracking-widest mt-1">Tam Kapasite</p>
+        <div id="results" class="hidden mt-12 space-y-6 pb-20">
+            <h3 class="text-xl font-black text-white italic uppercase tracking-widest flex items-center gap-4">
+                <span class="h-px bg-slate-800 flex-1"></span>
+                Bulunan Altyapı Hatları
+                <span class="h-px bg-slate-800 flex-1"></span>
+            </h3>
+
+            <div class="fade-slide-up bg-slate-900/60 p-8 rounded-[2rem] border border-orange-500/20 flex justify-between items-center group hover:border-orange-500/50 transition-all">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 bg-orange-500/10 rounded-2xl flex items-center justify-center font-black text-orange-500 shadow-xl group-hover:scale-110 transition-transform">TT</div>
+                    <div>
+                        <h4 class="text-white font-bold text-lg">Türk Telekom</h4>
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-tighter">HiperNet / VDSL Altyapısı</p>
                     </div>
                 </div>
+                <div class="text-right">
+                    <div class="text-3xl font-black text-white tracking-tighter">100 Mbps</div>
+                    <div class="text-[10px] text-green-500 font-bold uppercase tracking-widest">Port Durumu: Aktif</div>
+                </div>
+            </div>
 
-                <div class="glass-card p-8 rounded-3xl flex justify-between items-center border-l-4 border-blue-500 hover:bg-slate-800/40 transition-all">
-                    <div class="flex items-center gap-5">
-                        <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center font-black text-blue-500 text-xl">TN</div>
-                        <div>
-                            <p class="text-lg font-bold text-white leading-none">TurkNet</p>
-                            <p class="text-sm text-slate-400 mt-1">GigaFiber Teknolojisi</p>
-                        </div>
+            <div class="fade-slide-up bg-slate-900/60 p-8 rounded-[2rem] border border-blue-500/20 flex justify-between items-center group hover:border-blue-500/50 transition-all" style="animation-delay: 0.2s;">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center font-black text-blue-500 shadow-xl group-hover:scale-110 transition-transform">TN</div>
+                    <div>
+                        <h4 class="text-white font-bold text-lg">TurkNet GigaFiber</h4>
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-tighter">Özel Fiber Optik Hat</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-3xl font-black text-white italic">1000 <span class="text-sm not-italic text-slate-500 uppercase">Mbps</span></p>
-                        <p class="text-[10px] text-blue-400 font-black uppercase tracking-widest mt-1">Yerel Altyapı</p>
-                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-3xl font-black text-blue-500 tracking-tighter">1000 Mbps</div>
+                    <div class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Ultra Düşük Ping</div>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="max-w-5xl mx-auto px-6 pb-12 mt-10 text-center border-t border-slate-900 pt-16">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
-            <div class="space-y-3">
-                <i class="fas fa-fingerprint text-blue-500 text-2xl"></i>
-                <h5 class="text-xs font-black text-white uppercase tracking-widest">Bağımsız Analiz</h5>
-                <p class="text-[11px] text-slate-500">Tarafsız veri havuzu ile tüm operatörleri kıyaslarız.</p>
-            </div>
-            <div class="space-y-3">
-                <i class="fas fa-bolt text-blue-500 text-2xl"></i>
-                <h5 class="text-xs font-black text-white uppercase tracking-widest">Gerçek Zamanlı</h5>
-                <p class="text-[11px] text-slate-500">Operatör veritabanlarından anlık sorgulama yapılır.</p>
-            </div>
-            <div class="space-y-3">
-                <i class="fas fa-lock text-blue-500 text-2xl"></i>
-                <h5 class="text-xs font-black text-white uppercase tracking-widest">KVKK Uyumlu</h5>
-                <p class="text-[11px] text-slate-500">Adres verileriniz asla üçüncü şahıslarla paylaşılmaz.</p>
-            </div>
+    <footer class="max-w-5xl mx-auto mt-20 px-6 pb-20 border-t border-slate-900 pt-16">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16 text-center">
+            <div><p class="text-3xl font-black text-white italic">81</p><p class="text-[9px] text-slate-600 font-bold uppercase tracking-[0.3em]">İl Kayıtlı</p></div>
+            <div><p class="text-3xl font-black text-white italic">1.2M</p><p class="text-[9px] text-slate-600 font-bold uppercase tracking-[0.3em]">Sorgulama</p></div>
+            <div><p class="text-3xl font-black text-white italic">24/7</p><p class="text-[9px] text-slate-600 font-bold uppercase tracking-[0.3em]">Anlık Güncel</p></div>
+            <div><p class="text-3xl font-black text-white italic">100%</p><p class="text-[9px] text-slate-600 font-bold uppercase tracking-[0.3em]">Güvenli Veri</p></div>
         </div>
-        
-        <div class="glass-card p-8 rounded-[2rem] text-[12px] text-slate-500 leading-relaxed text-left border-l-4 border-blue-600/50">
-            <span class="font-bold text-slate-300 block mb-2 uppercase tracking-widest">Yasal Bilgilendirme:</span>
-            NetPusula, bölgenizdeki altyapı durumunu operatörlerin (Türk Telekom, TurkNet, Superonline vb.) açık sorgulama servislerini kullanarak analiz eden bağımsız bir platformdur. Belirtilen hızlar "maksimum" teorik değerler olup, bina içi tesisat kalitesine göre değişiklik gösterebilir. Sunulan veriler bilgilendirme amaçlıdır.
+        <div class="bg-slate-900/40 p-8 rounded-[2rem] border border-white/5 text-[11px] text-slate-500 leading-relaxed">
+            <b class="text-slate-400 block mb-2 uppercase tracking-widest">Hakkımızda & Veri Kaynağı:</b>
+            NetPusula, Türkiye'deki internet servis sağlayıcılarının altyapı verilerini anlık olarak analiz eden bağımsız bir platformdur. Sorgulama sonuçları Türk Telekom, TurkNet ve diğer operatörlerin halka açık API ve sorgu servislerinden derlenir. Belirtilen hızlar "en yüksek ulaşılabilir" değerler olup, bina içi kablolama durumuna göre değişiklik gösterebilir.
         </div>
-        
-        <p class="mt-12 text-[10px] text-slate-700 font-black uppercase tracking-[0.4em]">
-            &copy; 2026 NetPusula. Altyapı Analiz Teknolojileri.
-        </p>
     </footer>
 
     <script>
-        // Adım Adım Akış Yönetimi
-        function nextStep(id) {
+        function loadStep(id) {
             const el = document.getElementById(id);
             el.disabled = false;
-            el.focus();
+            el.innerHTML = '<option value="1">Yükleniyor...</option>';
             
-            // Simülasyon Verileri (Burada Python Backend Bağlanacak)
-            const mockData = {
-                'ilce': '<option value="">Kadıköy</option><option value="">Beşiktaş</option>',
-                'mahalle': '<option value="">Moda Mah.</option><option value="">Caferağa Mah.</option>',
-                'cadde': '<option value="">Lale Sokak</option><option value="">Şair Nefi Sokak</option>',
-                'bina': '<option value="">No: 12</option><option value="">No: 15/A</option>',
-                'daire': '<option value="">Daire: 3</option><option value="">Daire: 8</option>'
-            };
-            
-            if(mockData[id]) {
-                el.innerHTML = '<option value="">Seçiniz</option>' + mockData[id];
-            }
+            setTimeout(() => {
+                const mocks = {
+                    'ilce': '<option value="1">Kadıköy</option><option value="2">Üsküdar</option>',
+                    'mahalle': '<option value="1">Moda Mah.</option>',
+                    'cadde': '<option value="1">Lale Sokak</option>',
+                    'bina': '<option value="1">No: 5</option>',
+                    'daire': '<option value="1">Daire: 3</option>'
+                };
+                el.innerHTML = '<option value="">Seçiniz</option>' + mocks[id];
+            }, 400); // Fiber hissi için hafif bekleme
         }
 
-        function sorgula() {
-            const daire = document.getElementById('daire').value;
-            if(!daire && document.getElementById('daire').disabled === false) {
-                const panel = document.getElementById('sonucPaneli');
-                panel.classList.remove('hidden');
-                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                alert("Lütfen tüm adres adımlarını tamamla kanki!");
+        function startAnalysis() {
+            if(document.getElementById('daire').disabled) {
+                alert("Kanki önce adresi tam seç, fiberi nereye çekeceğiz? :)");
+                return;
             }
+            
+            const zone = document.getElementById('action-zone');
+            zone.classList.add('analyzing');
+            
+            // Analiz Animasyonu (1.5 saniye sürecek)
+            setTimeout(() => {
+                zone.classList.remove('analyzing');
+                const results = document.getElementById('results');
+                results.classList.remove('hidden');
+                results.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 1500);
         }
     </script>
 </body>
