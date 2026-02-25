@@ -3,155 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetPusula | Altyapı Sorgulama</title>
+    <title>NetPusula | Altyapı Sorgulama Servisi</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        body { background-color: #0b0f1a; color: #cbd5e1; font-family: 'Inter', sans-serif; }
-        .glass-panel { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        body { 
+            background-color: #060910; 
+            color: #cbd5e1; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: radial-gradient(#1e293b 0.5px, transparent 0.5px);
+            background-size: 30px 30px; /* Görseldeki o noktalı arka plan kanki */
+        }
+        .glass-card { 
+            background: rgba(15, 23, 42, 0.8); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+        }
+        .nav-link { @apply text-slate-400 hover:text-white text-sm font-semibold transition-all; }
         
         select {
-            @apply bg-slate-800 border-none p-4 rounded-2xl text-sm text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full;
+            @apply bg-slate-900/50 border border-slate-700/50 p-4 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-blue-500 w-full transition-all;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1.2em;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em;
         }
-        select:disabled { opacity: 0.2; cursor: not-allowed; }
-        .result-card { display: none; }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        select:disabled { opacity: 0.3; }
+        .btn-primary { @apply bg-[#0066ff] hover:bg-blue-500 text-white font-bold py-4 px-8 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="min-h-screen">
 
-    <div class="max-w-4xl w-full">
-        <div class="text-center mb-10">
-            <h1 class="text-5xl font-black text-white italic tracking-tighter uppercase">NetPusula</h1>
-            <p class="text-blue-500 text-xs font-bold tracking-[0.4em] uppercase mt-2">Hızlı Altyapı Sorgulama Servisi</p>
+    <nav class="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <i class="fas fa-chart-line text-white text-sm"></i>
+            </div>
+            <span class="text-xl font-extrabold tracking-tighter text-white">NetPusula</span>
         </div>
+        <div class="hidden md:flex gap-8">
+            <a href="#" class="nav-link text-white">Sorgula</a>
+            <a href="#" class="nav-link">Sağlayıcılar</a>
+            <a href="#" class="nav-link">Paketler</a>
+            <a href="#" class="nav-link">SSS</a>
+        </div>
+    </nav>
 
-        <div class="glass-panel p-8 rounded-[2.5rem] shadow-2xl mb-8">
-            <h3 class="text-white font-bold text-lg mb-6 flex items-center gap-2">
-                <i class="fas fa-map-marker-alt text-blue-500"></i> Adres Bilgilerinizi Seçin
-            </h3>
+    <div class="max-w-4xl mx-auto text-center mt-12 px-4">
+        <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 rounded-full mb-6">
+            <i class="fas fa-globe-europe text-blue-500 text-xs"></i>
+            <span class="text-blue-500 text-[11px] font-bold uppercase tracking-wider">Türkiye'nin En Kapsamlı Altyapı Servisi</span>
+        </div>
+        <h2 class="text-4xl md:text-6xl font-extrabold text-white leading-tight">
+            İnternet Altyapınızı <span class="text-blue-500 italic">Anında Sorgulayın</span>
+        </h2>
+        <p class="text-slate-400 mt-6 text-lg max-w-2xl mx-auto">
+            Adresinizi seçin, bölgenizdeki tüm internet servis sağlayıcılarını ve hız kapasitelerini saniyeler içinde görün.
+        </p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="glass-card mt-12 p-8 rounded-[2rem] text-left shadow-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase px-2">İl</label>
-                    <select id="il" onchange="nextStep('ilce')">
-                        <option value="">Seçiniz</option>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase ml-1">
+                        <i class="fas fa-city text-blue-500"></i> İl
+                    </label>
+                    <select id="il" onchange="step('ilce')">
+                        <option value="">İl Seçin</option>
                         <option value="34">İstanbul</option>
                         <option value="06">Ankara</option>
                     </select>
                 </div>
-
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase px-2">İlçe</label>
-                    <select id="ilce" onchange="nextStep('mahalle')" disabled><option value="">İlçe Seçin</option></select>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase ml-1">
+                        <i class="fas fa-map-marker-alt text-blue-500"></i> İlçe
+                    </label>
+                    <select id="ilce" onchange="step('mahalle')" disabled><option>İlçe Seçin</option></select>
                 </div>
-
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase px-2">Mahalle</label>
-                    <select id="mahalle" onchange="nextStep('cadde')" disabled><option value="">Mahalle Seçin</option></select>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase ml-1">
+                        <i class="fas fa-draw-polygon text-blue-500"></i> Mahalle
+                    </label>
+                    <select id="mahalle" onchange="step('cadde')" disabled><option>Mahalle Seçin</option></select>
                 </div>
-
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase px-2">Cadde / Sokak</label>
-                    <select id="cadde" onchange="nextStep('bina')" disabled><option value="">Cadde Seçin</option></select>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase ml-1">
+                        <i class="fas fa-road text-blue-500"></i> Sokak/Cadde
+                    </label>
+                    <select id="cadde" onchange="step('bina')" disabled><option>Sokak Seçin</option></select>
                 </div>
-
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase px-2">Bina No</label>
-                    <select id="bina" onchange="nextStep('daire')" disabled><option value="">Bina Seçin</option></select>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase ml-1">
+                        <i class="fas fa-building text-blue-500"></i> Kapı No
+                    </label>
+                    <select id="bina" onchange="step('daire')" disabled><option>No Seçin</option></select>
                 </div>
-
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase px-2">Daire No</label>
-                    <select id="daire" disabled><option value="">Daire Seçin</option></select>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase ml-1">
+                        <i class="fas fa-door-open text-blue-500"></i> Daire No
+                    </label>
+                    <select id="daire" disabled><option>Daire Seçin</option></select>
                 </div>
             </div>
-
-            <button onclick="sorgula()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl mt-10 shadow-lg shadow-blue-900/20 transition-all uppercase tracking-widest text-sm">
-                ALTYAPIYI SORGULA
+            <button onclick="sorgula()" class="btn-primary w-full mt-8">
+                <i class="fas fa-search"></i> ALTYAPI SORGULA
             </button>
         </div>
 
-        <div id="resultArea" class="result-card animate-fade-in">
-            <div class="glass-panel p-8 rounded-[2.5rem] border-t-4 border-blue-500">
-                <div class="flex justify-between items-center mb-6">
-                    <h4 class="text-2xl font-black text-white italic uppercase">Sorgu Sonucu</h4>
-                    <span class="bg-green-500/20 text-green-400 text-[10px] px-3 py-1 rounded-full font-bold border border-green-500/30">BOŞ PORT VAR</span>
-                </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 mb-20">
+            <div><p class="text-3xl font-extrabold text-white">81</p><p class="text-xs text-slate-500 uppercase font-bold tracking-widest">İl</p></div>
+            <div><p class="text-3xl font-extrabold text-white">973</p><p class="text-xs text-slate-500 uppercase font-bold tracking-widest">İlçe</p></div>
+            <div><p class="text-3xl font-extrabold text-white">10M+</p><p class="text-xs text-slate-500 uppercase font-bold tracking-widest">Adres</p></div>
+            <div><p class="text-3xl font-extrabold text-white">6+</p><p class="text-xs text-slate-500 uppercase font-bold tracking-widest">Sağlayıcı</p></div>
+        </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-bolt text-blue-500 text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-slate-500 font-bold uppercase">Maksimum Hız</p>
-                                <p class="text-2xl font-black text-white">1000 Mbps</p>
-                            </div>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-slate-700 text-sm">
-                            <span class="text-slate-400">Teknoloji:</span> <span class="text-blue-400 font-bold">FİBER (GPON)</span>
+        <div id="sonucPaneli" class="hidden mt-10 text-left space-y-4 animate-fade-in">
+            <h3 class="text-xl font-bold text-white mb-4">Adresinizdeki Altyapı Sağlayıcıları</h3>
+            
+            <div class="grid gap-4">
+                <div class="glass-card p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4 border-l-4 border-orange-500">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center font-bold text-orange-500">TT</div>
+                        <div>
+                            <p class="font-bold text-white">Türk Telekom</p>
+                            <p class="text-xs text-slate-400">HiperNet (VDSL)</p>
                         </div>
                     </div>
-
-                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-network-wired text-orange-500 text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-slate-500 font-bold uppercase">Yedek Altyapı</p>
-                                <p class="text-2xl font-black text-white">100 Mbps</p>
-                            </div>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-slate-700 text-sm">
-                            <span class="text-slate-400">Teknoloji:</span> <span class="text-orange-400 font-bold">VDSL2</span>
-                        </div>
+                    <div class="text-right">
+                        <p class="text-xl font-extrabold text-white">100 Mbps</p>
+                        <p class="text-[10px] text-green-500 font-bold uppercase">Port Müsait</p>
                     </div>
                 </div>
 
-                <div class="mt-8 text-center text-xs text-slate-500 italic">
-                    * Bu veriler bilgilendirme amaçlıdır. Net hız, santral mesafesine göre değişebilir.
+                <div class="glass-card p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4 border-l-4 border-blue-500">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center font-bold text-blue-500">TN</div>
+                        <div>
+                            <p class="font-bold text-white">TurkNet</p>
+                            <p class="text-xs text-slate-400">GigaFiber (GPON)</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xl font-extrabold text-white">1000 Mbps</p>
+                        <p class="text-[10px] text-blue-400 font-bold uppercase">Aktif Altyapı</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4 border-l-4 border-yellow-500">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center font-bold text-yellow-500">SOL</div>
+                        <div>
+                            <p class="font-bold text-white">Turkcell Superonline</p>
+                            <p class="text-xs text-slate-400">Fiber Altyapı</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xl font-extrabold text-white">1000 Mbps</p>
+                        <p class="text-[10px] text-yellow-500 font-bold uppercase">Sorgu Gerekli</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Adım Adım Açılan Seçim Kutuları
-        function nextStep(stepId) {
-            const nextSelect = document.getElementById(stepId);
-            if(nextSelect) {
-                nextSelect.disabled = false;
-                // Örnek Veri Doldurma (Buraları Python ile bağlayacağız)
-                if(stepId === 'ilce') nextSelect.innerHTML = '<option value="">Seçiniz</option><option value="kadikoy">Kadıköy</option><option value="besiktas">Beşiktaş</option>';
-                if(stepId === 'mahalle') nextSelect.innerHTML = '<option value="">Seçiniz</option><option value="moda">Moda Mah.</option>';
-                if(stepId === 'cadde') nextSelect.innerHTML = '<option value="">Seçiniz</option><option value="lale">Lale Sokak</option>';
-                if(stepId === 'bina') nextSelect.innerHTML = '<option value="">Seçiniz</option><option value="12">No: 12</option>';
-                if(stepId === 'daire') nextSelect.innerHTML = '<option value="">Seçiniz</option><option value="5">Daire: 5</option>';
-            }
+        function step(id) {
+            const el = document.getElementById(id);
+            el.disabled = false;
+            // Örnek data doldurma
+            if(id === 'ilce') el.innerHTML = '<option>Kadıköy</option><option>Beşiktaş</option>';
+            if(id === 'mahalle') el.innerHTML = '<option>Moda Mah.</option>';
+            if(id === 'cadde') el.innerHTML = '<option>Lale Sokak</option>';
+            if(id === 'bina') el.innerHTML = '<option>No: 12</option>';
+            if(id === 'daire') el.innerHTML = '<option>Daire: 5</option>';
         }
 
         function sorgula() {
-            const daire = document.getElementById('daire').value;
-            if(!daire) {
-                alert("Lütfen tüm adres bilgilerini eksiksiz seç kanki!");
-                return;
-            }
-            
-            // Sonuç alanını göster
-            const resultArea = document.getElementById('resultArea');
-            resultArea.style.display = 'block';
-            resultArea.scrollIntoView({ behavior: 'smooth' });
+            if(!document.getElementById('daire').value) return alert("Adres seç kanki!");
+            const panel = document.getElementById('sonucPaneli');
+            panel.classList.remove('hidden');
+            panel.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
