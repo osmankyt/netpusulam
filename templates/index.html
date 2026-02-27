@@ -3,185 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetPusula | Merkezi Altyapı Veri Havuzu</title>
-    
+    <title>NetPusula | Merkezi Altyapı Analiz Merkezi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-
     <style>
-        :root { --fiber-blue: #3b82f6; --fiber-glow: rgba(59, 130, 246, 0.4); }
         body { 
             background-color: #060910; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif;
             background-image: radial-gradient(#1e293b 0.5px, transparent 0.5px); background-size: 30px 30px;
         }
-
-        .glass-panel { 
-            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-
-        /* Seçim Kutuları - Jilet Gibi Düzenli */
-        .select-box { @apply flex flex-col gap-2 mb-4; }
+        .glass-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); }
         
+        /* ÇERÇEVELİ VE NET SEÇİM BARLARI */
         .custom-select {
-            @apply w-full bg-slate-900 border border-slate-800 text-white text-sm rounded-xl p-4 outline-none transition-all appearance-none cursor-pointer;
+            @apply w-full bg-[#0d131f] text-white text-sm rounded-xl p-4 outline-none appearance-none cursor-pointer transition-all;
+            border: 2px solid rgba(59, 130, 246, 0.2); /* Belirgin çerçeve */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem;
         }
+        .custom-select:hover { border-color: rgba(59, 130, 246, 0.5); }
+        .custom-select:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+        .custom-select:disabled { opacity: 0.15; border-color: rgba(255, 255, 255, 0.05); }
 
-        .custom-select:focus:not(:disabled) { @apply border-blue-500 bg-slate-800; box-shadow: 0 0 15px var(--fiber-glow); }
-        .custom-select:disabled { @apply opacity-20 grayscale; cursor: not-allowed; }
-
-        /* Fiber Akış Animasyonu */
-        .fiber-loader { height: 2px; width: 0; background: linear-gradient(90deg, transparent, var(--fiber-blue), #fff, var(--fiber-blue), transparent); position: absolute; bottom: 0; left: 0; transition: width 0.5s; }
-        .loading .fiber-loader { width: 100%; animation: dataStream 1.5s infinite; }
-        @keyframes dataStream { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-        .btn-fiber {
-            @apply bg-blue-600 hover:bg-blue-500 text-white font-black py-5 px-8 rounded-2xl transition-all relative overflow-hidden uppercase tracking-[0.2em] text-xs;
-        }
+        .loader-bar { height: 2px; width: 0; background: #3b82f6; position: absolute; bottom: 0; left: 0; transition: width 0.3s; }
+        .loading .loader-bar { width: 100%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <nav class="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <i class="fas fa-network-wired text-white"></i>
-            </div>
-            <span class="text-2xl font-black tracking-tighter text-white italic">NETPUSULA</span>
+    <nav class="max-w-6xl mx-auto p-8 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">NP</div>
+            <span class="text-2xl font-black text-white italic tracking-tighter">NETPUSULA</span>
         </div>
-        <div class="hidden md:flex items-center gap-6 bg-white/5 px-6 py-2 rounded-full border border-white/10">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Anlık Operatör Veri Akışı Aktif
-            </span>
+        <div class="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-4 py-2 rounded-full border border-blue-500/20 uppercase tracking-widest">
+            <i class="fas fa-check-circle mr-1"></i> Tüm Operatörler Bağlı
         </div>
     </nav>
 
-    <main class="max-w-5xl mx-auto mt-12 px-6">
+    <main class="max-w-5xl mx-auto mt-10 px-6">
         <div class="text-center mb-12">
-            <h1 class="text-5xl font-extrabold text-white tracking-tighter mb-6">
-                Tüm Altyapılar <span class="text-blue-500 italic">Tek Ekranda</span>
-            </h1>
-            <p class="text-slate-400 max-w-2xl mx-auto text-sm leading-relaxed">
-                Türk Telekom, TurkNet, Superonline ve KabloNet sistemlerine <b class="text-blue-400">NetPusula</b> üzerinden aynı anda erişin. Başka sitelerde vakit kaybetmeyin, en güncel veriyi merkezi havuzumuzdan sorgulayın.
-            </p>
+            <h1 class="text-5xl font-extrabold text-white mb-4">Tek Sorgu, <span class="text-blue-500">Tüm Altyapılar.</span></h1>
+            <p class="text-slate-400 text-sm max-w-xl mx-auto">Başka sitelerde vakit kaybetmeyin. NetPusula; Türk Telekom, TurkNet ve Superonline verilerini tek bir merkezde toplar.</p>
         </div>
 
-        <div id="queryCard" class="glass-panel p-10 rounded-[2.5rem] relative overflow-hidden">
+        <div id="queryBox" class="glass-card p-10 rounded-[2.5rem] relative overflow-hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <div class="select-box">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">1. Şehir</label>
-                    <select id="il" class="custom-select" onchange="fetchData('ilce', this.value)">
-                        <option value="">İl Seçiniz</option>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">İl</label>
+                    <select id="il" class="custom-select" onchange="loadAddress('ilce', this.value)">
+                        <option value="">Seçiniz</option>
                         <option value="34">İstanbul</option>
                         <option value="06">Ankara</option>
                     </select>
                 </div>
-
-                <div class="select-box">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">2. İlçe</label>
-                    <select id="ilce" class="custom-select" onchange="fetchData('mahalle', this.value)" disabled><option>İlçe Seçin</option></select>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">İlçe</label>
+                    <select id="ilce" class="custom-select" onchange="loadAddress('mahalle', this.value)" disabled></select>
                 </div>
-
-                <div class="select-box">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">3. Mahalle</label>
-                    <select id="mahalle" class="custom-select" onchange="fetchData('sokak', this.value)" disabled><option>Mahalle Seçin</option></select>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Mahalle</label>
+                    <select id="mahalle" class="custom-select" onchange="loadAddress('sokak', this.value)" disabled></select>
                 </div>
-
-                <div class="select-box">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">4. Sokak / Cadde</label>
-                    <select id="sokak" class="custom-select" onchange="fetchData('bina', this.value)" disabled><option>Sokak Seçin</option></select>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Sokak</label>
+                    <select id="sokak" class="custom-select" onchange="loadAddress('bina', this.value)" disabled></select>
                 </div>
-
-                <div class="select-box">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">5. Bina No</label>
-                    <select id="bina" class="custom-select" onchange="fetchData('daire', this.value)" disabled><option>No Seçin</option></select>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Bina No</label>
+                    <select id="bina" class="custom-select" onchange="loadAddress('daire', this.value)" disabled></select>
                 </div>
-
-                <div class="select-box">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">6. Daire No</label>
-                    <select id="daire" class="custom-select" disabled><option>Daire Seçin</option></select>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Daire No</label>
+                    <select id="daire" class="custom-select" disabled></select>
                 </div>
-
             </div>
 
-            <button onclick="runUltimateQuery()" class="btn-fiber w-full mt-8">
-                <i class="fas fa-microchip mr-2"></i> Merkezi Analizi Başlat
+            <button onclick="startRealQuery()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl mt-10 transition-all uppercase tracking-widest text-xs">
+                SİSTEMLERİ TARA VE ANALİZ ET
             </button>
-            <div class="fiber-loader"></div>
+            <div class="loader-bar"></div>
         </div>
 
-        <div id="resultsArea" class="hidden mt-12 space-y-6 pb-20">
-            <h3 class="text-white font-bold uppercase tracking-widest text-xs flex items-center gap-3">
-                <i class="fas fa-poll text-blue-500"></i> Operatör Bazlı Altyapı Raporu
-            </h3>
-            
-            <div id="resultCards" class="grid gap-4">
-                </div>
-        </div>
+        <div id="results" class="hidden mt-12 grid gap-4 pb-20">
+            </div>
     </main>
 
-    <footer class="max-w-5xl mx-auto py-20 px-6 border-t border-slate-900 text-center">
-        <div class="bg-blue-500/5 border border-blue-500/10 p-8 rounded-3xl text-left mb-10">
-            <h4 class="text-white font-bold text-sm mb-4 uppercase tracking-widest">⚠️ Önemli Bilgilendirme:</h4>
-            <p class="text-xs text-slate-500 leading-relaxed">
-                NetPusula bir internet servis sağlayıcısı değildir. Bu platform; <b>Türk Telekom</b>, <b>TurkNet</b>, <b>Turkcell Superonline</b> ve <b>Türksat KabloNet</b> operatörlerinin halka açık sorgulama servislerinden aldığı verileri tek bir panelde birleştiren bir "Veri Agregatörü"dür. Yapılan her sorgu, doğrudan ilgili operatörlerin güncel veritabanlarından anlık olarak çekilmektedir. Başka bir platformda sorgulama yapmanıza gerek kalmadan tüm Türkiye altyapı haritasını buradan görebilirsiniz.
-            </p>
-        </div>
-        <p class="text-[10px] text-slate-700 font-black uppercase tracking-[0.5em]">&copy; 2026 NETPUSULA ANALYTICS</p>
-    </footer>
-
     <script>
-        // GERÇEK VERİ AKIŞI FONKSİYONU
-        async function fetchData(nextId, parentValue) {
-            if(!parentValue) return;
-            const nextEl = document.getElementById(nextId);
-            nextEl.disabled = false;
-            nextEl.innerHTML = '<option>Veri alınıyor...</option>';
-
-            try {
-                // BURASI GERÇEK BACKEND'E (app.py) BAĞLANACAK
-                const response = await fetch(`/get_address?type=${nextId}&parent=${parentValue}`);
-                const data = await response.json();
-                
-                nextEl.innerHTML = '<option value="">Seçiniz</option>';
-                data.forEach(item => {
-                    nextEl.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-                });
-            } catch (err) {
-                // Demo için hata anında mock data gösterelim (Backend yazılana kadar)
-                nextEl.innerHTML = '<option value="">Seçiniz</option><option value="demo">Demo Kayıt</option>';
-            }
+        // GERÇEK BACKEND BAĞLANTISI
+        async function loadAddress(type, parent) {
+            if(!parent) return;
+            const el = document.getElementById(type);
+            el.disabled = false;
+            el.innerHTML = '<option>Yükleniyor...</option>';
+            
+            const res = await fetch(`/api/address?type=${type}&parent=${parent}`);
+            const data = await res.json();
+            
+            el.innerHTML = '<option value="">Seçiniz</option>';
+            data.forEach(item => {
+                el.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            });
         }
 
-        async function runUltimateQuery() {
-            if(document.getElementById('daire').disabled) return alert("Lütfen tüm adımları seç kanki!");
+        async function startRealQuery() {
+            const box = document.getElementById('queryBox');
+            box.classList.add('loading');
             
-            const card = document.getElementById('queryCard');
-            card.classList.add('loading');
+            const res = await fetch('/api/query', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({daire_id: document.getElementById('daire').value})
+            });
+            const results = await res.json();
             
-            // Operatörlerden veri çekme simülasyonu (1.5 sn)
             setTimeout(() => {
-                card.classList.remove('loading');
-                const results = document.getElementById('resultsArea');
-                results.classList.remove('hidden');
-                
-                // Örnek sonuç kartlarını basıyoruz
-                document.getElementById('resultCards').innerHTML = `
-                    <div class="glass-panel p-6 rounded-2xl flex justify-between items-center border-l-4 border-orange-500">
-                        <div><p class="text-white font-bold">Türk Telekom</p><p class="text-[10px] text-slate-500">VDSL2 Altyapı</p></div>
-                        <div class="text-right"><p class="text-2xl font-black text-white">87 Mbps</p><p class="text-[10px] text-green-500 uppercase">Boş Port Mevcut</p></div>
+                box.classList.remove('loading');
+                const resDiv = document.getElementById('results');
+                resDiv.innerHTML = results.map(r => `
+                    <div class="glass-card p-8 rounded-3xl flex justify-between items-center border-l-4" style="border-color: ${r.color}">
+                        <div>
+                            <h4 class="text-white font-bold">${r.isp}</h4>
+                            <p class="text-xs text-slate-500">${r.tech}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-3xl font-black text-white">${r.speed} <span class="text-xs">Mbps</span></p>
+                            <p class="text-[10px] font-bold uppercase" style="color: ${r.color}">${r.status}</p>
+                        </div>
                     </div>
-                    <div class="glass-panel p-6 rounded-2xl flex justify-between items-center border-l-4 border-blue-500">
-                        <div><p class="text-white font-bold">TurkNet GigaFiber</p><p class="text-[10px] text-slate-500">Özel Fiber Hat</p></div>
-                        <div class="text-right"><p class="text-2xl font-black text-blue-500">1000 Mbps</p><p class="text-[10px] text-blue-400 uppercase">Aktif Bölge</p></div>
-                    </div>
-                `;
-                results.scrollIntoView({ behavior: 'smooth' });
-            }, 1500);
+                `).join('');
+                resDiv.classList.remove('hidden');
+                resDiv.scrollIntoView({ behavior: 'smooth' });
+            }, 1000);
         }
     </script>
 </body>
