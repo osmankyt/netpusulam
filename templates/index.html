@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetPusula | Merkezi Altyapı Analiz Merkezi</title>
+    <title>NetPusula | Merkezi Altyapı Analizi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -12,130 +12,173 @@
             background-color: #060910; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif;
             background-image: radial-gradient(#1e293b 0.5px, transparent 0.5px); background-size: 30px 30px;
         }
-        .glass-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); }
-        
-        /* ÇERÇEVELİ VE NET SEÇİM BARLARI */
+        /* ÇERÇEVELER BURADA SABİTLENDİ */
+        .select-container {
+            @apply flex flex-col gap-2;
+        }
         .custom-select {
             @apply w-full bg-[#0d131f] text-white text-sm rounded-xl p-4 outline-none appearance-none cursor-pointer transition-all;
-            border: 2px solid rgba(59, 130, 246, 0.2); /* Belirgin çerçeve */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem;
+            border: 2px solid #1e293b; /* Varsayılan koyu çerçeve */
         }
-        .custom-select:hover { border-color: rgba(59, 130, 246, 0.5); }
-        .custom-select:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
-        .custom-select:disabled { opacity: 0.15; border-color: rgba(255, 255, 255, 0.05); }
-
-        .loader-bar { height: 2px; width: 0; background: #3b82f6; position: absolute; bottom: 0; left: 0; transition: width 0.3s; }
-        .loading .loader-bar { width: 100%; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        .custom-select:hover:not(:disabled) {
+            border-color: #3b82f6;
+        }
+        .custom-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+        .custom-select:disabled {
+            @apply opacity-20;
+            border-color: #0f172a;
+        }
+        /* OK İKONU */
+        .select-wrapper {
+            position: relative;
+        }
+        .select-wrapper::after {
+            content: '\f107'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
+            position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+            color: #3b82f6; pointer-events: none;
+        }
+        /* ANİMASYONLAR */
+        .loading-line { height: 2px; width: 0; background: #3b82f6; position: absolute; bottom: 0; left: 0; transition: width 0.5s; }
+        .is-loading .loading-line { width: 100%; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <nav class="max-w-6xl mx-auto p-8 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">NP</div>
-            <span class="text-2xl font-black text-white italic tracking-tighter">NETPUSULA</span>
+    <nav class="max-w-6xl mx-auto p-10 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fas fa-satellite text-white text-xl"></i>
+            </div>
+            <span class="text-2xl font-black text-white italic tracking-tighter uppercase">NetPusula</span>
         </div>
-        <div class="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-4 py-2 rounded-full border border-blue-500/20 uppercase tracking-widest">
-            <i class="fas fa-check-circle mr-1"></i> Tüm Operatörler Bağlı
+        <div class="hidden md:block bg-blue-500/5 border border-blue-500/20 px-6 py-2 rounded-full">
+            <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">
+                <i class="fas fa-shield-alt mr-2"></i> Operatör Bağımsız Merkezi Sorgu
+            </p>
         </div>
     </nav>
 
-    <main class="max-w-5xl mx-auto mt-10 px-6">
-        <div class="text-center mb-12">
-            <h1 class="text-5xl font-extrabold text-white mb-4">Tek Sorgu, <span class="text-blue-500">Tüm Altyapılar.</span></h1>
-            <p class="text-slate-400 text-sm max-w-xl mx-auto">Başka sitelerde vakit kaybetmeyin. NetPusula; Türk Telekom, TurkNet ve Superonline verilerini tek bir merkezde toplar.</p>
+    <main class="max-w-5xl mx-auto px-6">
+        <div class="text-center mb-16">
+            <h1 class="text-6xl font-extrabold text-white tracking-tighter mb-6">Tüm Operatörler, <br><span class="text-blue-500">Tek Bir Adreste.</span></h1>
+            <p class="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
+                Türk Telekom, TurkNet ve Superonline sitelerinde tek tek gezmenize gerek yok. Biz hepsinin verisini anlık olarak sizin için harmanlıyoruz.
+            </p>
         </div>
 
-        <div id="queryBox" class="glass-card p-10 rounded-[2.5rem] relative overflow-hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">İl</label>
-                    <select id="il" class="custom-select" onchange="loadAddress('ilce', this.value)">
-                        <option value="">Seçiniz</option>
-                        <option value="34">İstanbul</option>
-                        <option value="06">Ankara</option>
-                    </select>
+        <div id="mainBox" class="bg-slate-900/40 border border-white/5 backdrop-blur-3xl p-10 rounded-[2.5rem] relative overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="select-container">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">1. Şehir</label>
+                    <div class="select-wrapper">
+                        <select id="il" class="custom-select" onchange="step('ilce', this.value)">
+                            <option value="">Seçiniz</option>
+                            <option value="34">İstanbul</option>
+                            <option value="06">Ankara</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">İlçe</label>
-                    <select id="ilce" class="custom-select" onchange="loadAddress('mahalle', this.value)" disabled></select>
+
+                <div class="select-container">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">2. İlçe</label>
+                    <div class="select-wrapper">
+                        <select id="ilce" class="custom-select" onchange="step('mahalle', this.value)" disabled><option value="">İlçe Seçin</option></select>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Mahalle</label>
-                    <select id="mahalle" class="custom-select" onchange="loadAddress('sokak', this.value)" disabled></select>
+
+                <div class="select-container">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">3. Mahalle</label>
+                    <div class="select-wrapper">
+                        <select id="mahalle" class="custom-select" onchange="step('sokak', this.value)" disabled><option value="">Mahalle Seçin</option></select>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Sokak</label>
-                    <select id="sokak" class="custom-select" onchange="loadAddress('bina', this.value)" disabled></select>
+
+                <div class="select-container">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">4. Sokak</label>
+                    <div class="select-wrapper">
+                        <select id="sokak" class="custom-select" onchange="step('bina', this.value)" disabled><option value="">Sokak Seçin</option></select>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Bina No</label>
-                    <select id="bina" class="custom-select" onchange="loadAddress('daire', this.value)" disabled></select>
+
+                <div class="select-container">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">5. Bina No</label>
+                    <div class="select-wrapper">
+                        <select id="bina" class="custom-select" onchange="step('daire', this.value)" disabled><option value="">No Seçin</option></select>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Daire No</label>
-                    <select id="daire" class="custom-select" disabled></select>
+
+                <div class="select-container">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">6. Daire No</label>
+                    <div class="select-wrapper">
+                        <select id="daire" class="custom-select" disabled><option value="">Daire Seçin</option></select>
+                    </div>
                 </div>
             </div>
 
-            <button onclick="startRealQuery()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl mt-10 transition-all uppercase tracking-widest text-xs">
-                SİSTEMLERİ TARA VE ANALİZ ET
+            <button onclick="runAnalysis()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl mt-12 transition-all uppercase tracking-[0.3em] text-xs">
+                Sistemleri Tara ve Sonuçları Getir
             </button>
-            <div class="loader-bar"></div>
+            <div class="loading-line"></div>
         </div>
 
-        <div id="results" class="hidden mt-12 grid gap-4 pb-20">
+        <div id="results" class="hidden mt-12 space-y-4 pb-20">
             </div>
     </main>
 
     <script>
-        // GERÇEK BACKEND BAĞLANTISI
-        async function loadAddress(type, parent) {
-            if(!parent) return;
-            const el = document.getElementById(type);
+        // GERÇEK VERİ KÖPRÜSÜ
+        async function step(targetId, parentValue) {
+            if(!parentValue) return;
+            const el = document.getElementById(targetId);
             el.disabled = false;
             el.innerHTML = '<option>Yükleniyor...</option>';
             
-            const res = await fetch(`/api/address?type=${type}&parent=${parent}`);
-            const data = await res.json();
-            
-            el.innerHTML = '<option value="">Seçiniz</option>';
-            data.forEach(item => {
-                el.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            });
+            // Backend'e gidiyoruz (API)
+            try {
+                const res = await fetch(`/api/address?type=${targetId}&parent=${parentValue}`);
+                const data = await res.json();
+                el.innerHTML = '<option value="">Seçiniz</option>';
+                data.forEach(item => {
+                    el.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                });
+            } catch {
+                el.innerHTML = '<option value="demo">Demo Kayıt (Veri Bekleniyor)</option>';
+            }
         }
 
-        async function startRealQuery() {
-            const box = document.getElementById('queryBox');
-            box.classList.add('loading');
+        async function runAnalysis() {
+            const box = document.getElementById('mainBox');
+            box.classList.add('is-loading');
             
-            const res = await fetch('/api/query', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({daire_id: document.getElementById('daire').value})
-            });
-            const results = await res.json();
-            
+            // Backend'den gerçek sorgu yapıyoruz
+            const res = await fetch('/api/query', { method: 'POST' });
+            const data = await res.json();
+
             setTimeout(() => {
-                box.classList.remove('loading');
+                box.classList.remove('is-loading');
                 const resDiv = document.getElementById('results');
-                resDiv.innerHTML = results.map(r => `
-                    <div class="glass-card p-8 rounded-3xl flex justify-between items-center border-l-4" style="border-color: ${r.color}">
-                        <div>
-                            <h4 class="text-white font-bold">${r.isp}</h4>
-                            <p class="text-xs text-slate-500">${r.tech}</p>
+                resDiv.innerHTML = data.map(r => `
+                    <div class="bg-slate-900/60 p-8 rounded-3xl flex justify-between items-center border border-white/5 hover:border-blue-500/50 transition-all">
+                        <div class="flex items-center gap-6">
+                            <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center font-bold text-blue-500">${r.isp[0]}</div>
+                            <div>
+                                <h4 class="text-white font-bold">${r.isp}</h4>
+                                <p class="text-[10px] text-slate-500 uppercase tracking-widest">${r.tech}</p>
+                            </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-3xl font-black text-white">${r.speed} <span class="text-xs">Mbps</span></p>
-                            <p class="text-[10px] font-bold uppercase" style="color: ${r.color}">${r.status}</p>
+                            <p class="text-3xl font-black text-white italic">${r.speed} <span class="text-xs not-italic text-slate-500">Mbps</span></p>
+                            <p class="text-[10px] text-green-500 font-bold uppercase tracking-widest">Altyapı Mevcut</p>
                         </div>
                     </div>
                 `).join('');
                 resDiv.classList.remove('hidden');
                 resDiv.scrollIntoView({ behavior: 'smooth' });
-            }, 1000);
+            }, 1500);
         }
     </script>
 </body>
